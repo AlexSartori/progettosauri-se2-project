@@ -6,3 +6,4 @@
 
 #### Members
 - [Sartori Alessandro](https://github.com/AlexSartori)
+- [Lotito Quintino Francesco](https://github.com/FraLotito)
