@@ -1,5 +1,5 @@
 const express = require('express');
-const PORT = 8888;
+const PORT = 3000;
 let app = express();
 
 app.get('/', (req, res) => res.send('Hello World!'));
