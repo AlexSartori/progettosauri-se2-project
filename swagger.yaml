@@ -2,119 +2,301 @@ swagger: '2.0'
 info:
   version: '1.0'
   title: "progettosauri"
-  description: Polls is a simple API allowing consumers to view polls and vote in them.
+  description: Progettosauri SE2 project - API documentation
   license:
     name: MIT
     url: https://github.com/apiaryio/polls-api/blob/master/LICENSE
-host: polls.apiblueprint.org
-basePath: /
-schemes:
-- http
+host: progettosauri-se2-project.herokuapp.com/
+basePath: /api/v1/
 consumes:
 - application/json
 produces:
 - application/json
+
+tags:
+  - name: "User Management"
+  - name: "Exams"
+  - name: "Tasks"
+  - name: "Classes"
+  - name: "Task Groups"
+
 paths:
-  /questions:
-    x-summary: Questions Collection
-    get:
-      summary: List All Questions
-      responses:
-        200:
-          description: Successful Response
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Question'
-          examples:
-            application/json:
-              - question: Favourite programming language?
-                published_at: '2015-08-05T08:40:51.620Z'
-                choices:
-                  - choice: Swift
-                    votes: 2048
-                  - choice: Python
-                    votes: 1024
-                  - choice: Objective-C
-                    votes: 512
-                  - choice: Ruby
-                    votes: 256
+
+  /users:
+    # Sign Up
     post:
-      description: >-
-        You may create your own question using this action. It takes a JSON
-        object containing a question and a collection of answers in the
-        form of choices.
-      summary: Create a New Question
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/QuestionRequest'
+      summary: Register a new user
+      tags:
+        - "User Management"
       responses:
         201:
-          description: ''
-          schema:
-            $ref: '#/definitions/Question'
-          examples:
-            application/json:
-                question: Favourite programming language?
-                published_at: '2015-08-05T08:40:51.620Z'
-                choices:
-                  - choice: Swift
-                    votes: 0
-                  - choice: Python
-                    votes: 0
-                  - choice: Objective-C
-                    votes: 0
-                  - choice: Ruby
-                    votes: 0
-definitions:
-  Question:
-    title: Question
-    type: object
-    properties:
-      question:
-        type: string
-      published_at:
-        type: string
-      choices:
-        type: array
-        items:
-          $ref: '#/definitions/Choice'
-    required:
-      - question
-      - published_at
-      - choices
-  Choice:
-    title: Choice
-    type: object
-    properties:
-      votes:
-        type: integer
-        format: int32
-      choice:
-        type: string
-    required:
-      - votes
-      - choice
-  QuestionRequest:
-    title: Question Request
-    type: object
-    properties:
-      question:
-        type: string
-      choices:
-        type: array
-        items:
-          type: string
-    required:
-      - question
-      - choices
-    example:
-      question: Favourite programming language?
-      choices:
-        - Swift
-        - Python
-        - Objective-C
-        - Ruby
+          description: Success, user has been created
+        400:
+          description: Invalid parameters
+
+  /users/{user_id}:
+    # User details
+    get:
+      summary: Get details about a user
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the desired user
+      tags:
+        - "User Management"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameter
+        404:
+          description: User does not exist
+
+    # Edit user details
+    put:
+      summary: Edit a user
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Parameter description in Markdown.
+      tags:
+        - "User Management"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: User does not exist
+
+  /exams:
+    # Visualize exams
+    get:
+      summary: "View your exams"
+      description: "View both the exams you have created, the ones you can participate in and those you have completed"
+      tags:
+        - "Exams"
+      responses:
+        200:
+          description: Success
+
+    # Create an exam
+    post:
+      summary: "Create an exam from a set of tasks"
+      tags:
+        - "Exams"
+      responses:
+        201:
+          description: Success, exam has been created
+        400:
+          description: Bad parameter
+
+
+  /exams/{exam_id}:
+    # Paricipating in an exam
+    get:
+      summary: "Access an exam's tasks"
+      parameters:
+        - in: path
+          name: exam_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the exam
+      tags:
+        - "Exams"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
+    # Submitting an answer to an exam
+    post:
+      summary: "Send answers of an exam"
+      parameters:
+        - in: path
+          name: exam_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the exam
+      tags:
+        - "Exams"
+      responses:
+        201:
+          description: Success, submitted
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
+  /exams/{exam_id}/evaluation:
+    # Get the evaluation for an exam
+    get:
+      summary: "View the evaluation of an exam"
+      parameters:
+        - in: path
+          name: exam_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the exam
+      tags:
+        - "Exams"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
+    # Evaluate an exam's answers
+    post:
+      summary: "Submit an evaluation for an exam"
+      parameters:
+        - in: path
+          name: exam_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the exam
+      tags:
+        - "Exams"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
+  /tasks:
+    # Visualize available tasks
+    get:
+      summary: "View tasks created by and shared with the logged user"
+      tags:
+        - "Tasks"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameter
+
+    # Create tasks
+    post:
+      summary: "Create a task"
+      tags:
+        - "Tasks"
+      responses:
+        201:
+          description: Success, task has been created
+        400:
+          description: Bad parameters
+
+  /tasks/{task_id}:
+    # Visualize a task
+    get:
+      summary: "View details of a specified task"
+      tags:
+        - "Tasks"
+      parameters:
+        - in: path
+          name: task_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the task
+      responses:
+        200:
+          description: Success
+        403:
+          description: Permission denied
+        404:
+          description: Task does not exist
+
+  /classes:
+    # Get classes
+    get:
+      summary: "Get all classes"
+      tags:
+        - "Classes"
+      responses:
+        200:
+          description: Success
+        403:
+          description: Permission denied
+
+    # Create a class
+    post:
+      summary: "Create a group of students identified as a class"
+      tags:
+        - "Classes"
+      responses:
+        201:
+          description: Success, created
+        400:
+          description: Bad parameters
+
+    # Update a class
+    put:
+      summary: "Update a class of students"
+      tags:
+        - "Classes"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameters
+
+  /task_groups:
+    # Create a task Groups
+    post:
+      summary: "Create a group of tasks"
+      tags:
+        - "Task Groups"
+      responses:
+        201:
+          description: Success, a task group has been created
+        400:
+          description: Bad parameters
+
+  /task_groups/{task_group_id}:
+    # Add a task to a task group
+    put:
+      summary: "Add a specified task to a task group"
+      tags:
+        - "Task Groups"
+      parameters:
+        - in: path
+          name: task_group_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the task group
+      responses:
+        200:
+          description: Success
+        403:
+          description: Permission denied
+        404:
+          description: Task group does not exist
