@@ -6,8 +6,8 @@ info:
   license:
     name: MIT
     url: https://github.com/apiaryio/polls-api/blob/master/LICENSE
-host: progettosauri-se2-project.herokuapp.com/
-basePath: /api/v1/
+host: progettosauri-se2-project.herokuapp.com
+basePath: /api/v1
 consumes:
 - application/json
 produces:
