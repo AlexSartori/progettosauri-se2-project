@@ -252,7 +252,7 @@ paths:
       tags:
         - "Exams"
       responses:
-        200:
+        201:
           description: Success
         400:
           description: Bad parameter
@@ -343,7 +343,7 @@ paths:
       tags:
         - "Exams"
       responses:
-        201:
+        200:
           description: Success, submitted
         400:
           description: Bad parameter
@@ -379,7 +379,47 @@ paths:
   /tasks/{task_id}:
     # Visualize a task
     get:
-      summary: "View details of a specified task"
+      summary: "View details of a task"
+      tags:
+        - "Tasks"
+      parameters:
+        - in: path
+          name: task_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the task
+      responses:
+        200:
+          description: Success
+        403:
+          description: Permission denied
+        404:
+          description: Task does not exist
+
+    # Update a task
+    put:
+      summary: "Update a task"
+      tags:
+        - "Tasks"
+      parameters:
+        - in: path
+          name: task_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the task
+      responses:
+        200:
+          description: Success
+        403:
+          description: Permission denied
+        404:
+          description: Task does not exist
+
+    # Delete a task
+    delete:
+      summary: "Delete a task"
       tags:
         - "Tasks"
       parameters:
@@ -423,7 +463,7 @@ paths:
 
     # Update a class
     put:
-      summary: "Update a class of students"
+      summary: "Update a class"
       tags:
         - "Classes"
       responses:
@@ -432,9 +472,75 @@ paths:
         400:
           description: Bad parameters
 
+  /classes/{class_id}:
+    # Get info about a specific class
+    get:
+      summary: "Get information about a class"
+      tags:
+        - "Classes"
+      parameters:
+        - in: path
+          name: class_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the class
+      responses:
+        200:
+          description: Success
+        403:
+          description: Permission denied
+
+    # Modify a specific class
+    put:
+      summary: "Modify a class"
+      tags:
+        - "Classes"
+      parameters:
+        - in: path
+          name: class_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the class
+      responses:
+        200:
+          description: Success, created
+        400:
+          description: Bad parameters
+
+    # delete a class
+    delete:
+      summary: "Delete a class"
+      tags:
+        - "Classes"
+      parameters:
+        - in: path
+          name: class_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the class
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameters
+
 ##################################################################   Task Groups
   /task_groups:
-    # Create a task Groups
+    # Get Task Groups
+    get:
+      summary: "Get task groups"
+      tags:
+        - "Task Groups"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameters
+
+    # Create a Task Group
     post:
       summary: "Create a group of tasks"
       tags:
@@ -446,9 +552,48 @@ paths:
           description: Bad parameters
 
   /task_groups/{task_group_id}:
-    # Add a task to a task group
+    # Get Task Groups
+    get:
+      summary: "View a task group"
+      tags:
+        - "Task Groups"
+      parameters:
+        - in: path
+          name: task_group_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the task group
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameters
+
+    # Edit a task group
     put:
-      summary: "Add a specified task to a task group"
+      summary: "Edit a task group"
+      tags:
+        - "Task Groups"
+      parameters:
+        - in: path
+          name: task_group_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the task group
+      responses:
+        200:
+          description: Success
+        403:
+          description: Permission denied
+        404:
+          description: Task group does not exist
+
+
+    # Delete a task group
+    delete:
+      summary: "Delete a task group"
       tags:
         - "Task Groups"
       parameters:
