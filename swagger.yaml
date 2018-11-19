@@ -21,7 +21,7 @@ tags:
   - name: "Task Groups"
 
 paths:
-
+########################################################################   Users
   /users:
     # Sign Up
     post:
@@ -77,6 +77,29 @@ paths:
         404:
           description: User does not exist
 
+    # Delete user
+    delete:
+      summary: Delete a user
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Parameter description in Markdown.
+      tags:
+        - "User Management"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: User does not exist
+
+########################################################################   Exams
   /exams:
     # Visualize exams
     get:
@@ -90,7 +113,8 @@ paths:
 
     # Create an exam
     post:
-      summary: "Create an exam from a set of tasks"
+      summary: "Create an exam"
+      description: "Create an exam from a set of tasks"
       tags:
         - "Exams"
       responses:
@@ -99,11 +123,10 @@ paths:
         400:
           description: Bad parameter
 
-
   /exams/{exam_id}:
-    # Paricipating in an exam
+    # Info about an exam
     get:
-      summary: "Access an exam's tasks"
+      summary: "Get info about an exam"
       parameters:
         - in: path
           name: exam_id
@@ -123,9 +146,9 @@ paths:
         404:
           description: Exam does not exist
 
-    # Submitting an answer to an exam
-    post:
-      summary: "Send answers of an exam"
+    # Update info about an exam
+    put:
+      summary: "Update info about an exam"
       parameters:
         - in: path
           name: exam_id
@@ -136,8 +159,54 @@ paths:
       tags:
         - "Exams"
       responses:
-        201:
-          description: Success, submitted
+        200:
+          description: Success
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
+    # Delete an exam
+    delete:
+      summary: "Delete an exam"
+      parameters:
+        - in: path
+          name: exam_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the exam
+      tags:
+        - "Exams"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
+  /exams/{exam_id}/tasks:
+    # Get the evaluation for an exam
+    get:
+      summary: "View the contents of an exam"
+      description: "View the contents of the specified exam. If called by a students, the exam is considered to be started."
+      parameters:
+        - in: path
+          name: exam_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the exam
+      tags:
+        - "Exams"
+      responses:
+        200:
+          description: Success
         400:
           description: Bad parameter
         403:
@@ -149,6 +218,7 @@ paths:
     # Get the evaluation for an exam
     get:
       summary: "View the evaluation of an exam"
+      description: "View the evaluation of the specified exam. If called by the exam creator returns every student's evaluation"
       parameters:
         - in: path
           name: exam_id
@@ -171,6 +241,7 @@ paths:
     # Evaluate an exam's answers
     post:
       summary: "Submit an evaluation for an exam"
+      description: "Submit an evaluation for an exam"
       parameters:
         - in: path
           name: exam_id
@@ -190,6 +261,98 @@ paths:
         404:
           description: Exam does not exist
 
+    # Modify the evaluation for an exam
+    put:
+      summary: "Modify an evaluation for an exam"
+      parameters:
+        - in: path
+          name: exam_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the exam
+      tags:
+        - "Exams"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
+  /exams/{exam_id}/answers:
+    # Get the answers for an exam
+    get:
+      summary: "View the answers of an exam"
+      description: "If called by a student returns his own answers. If called by the exam creator returns every student's answers."
+      parameters:
+        - in: path
+          name: exam_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the exam
+      tags:
+        - "Exams"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
+    # Submit answers to an exam
+    post:
+      summary: "Send answers of an exam"
+      description: "Send answers of an exam"
+      parameters:
+        - in: path
+          name: exam_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the exam
+      tags:
+        - "Exams"
+      responses:
+        201:
+          description: Success, submitted
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
+    # Modify answers to an exam
+    put:
+      summary: "Modify answers of an exam"
+      parameters:
+        - in: path
+          name: exam_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the exam
+      tags:
+        - "Exams"
+      responses:
+        201:
+          description: Success, submitted
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
+########################################################################   Tasks
   /tasks:
     # Visualize available tasks
     get:
@@ -234,6 +397,7 @@ paths:
         404:
           description: Task does not exist
 
+######################################################################   Classes
   /classes:
     # Get classes
     get:
@@ -268,6 +432,7 @@ paths:
         400:
           description: Bad parameters
 
+##################################################################   Task Groups
   /task_groups:
     # Create a task Groups
     post:
