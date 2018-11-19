@@ -610,3 +610,129 @@ paths:
           description: Permission denied
         404:
           description: Task group does not exist
+
+
+##################################################################   Definitions
+definitions:
+
+  User:
+    properties:
+      id:
+        type: integer
+      email:
+        type: string
+      password:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+    required:
+      - email
+      - password
+      - name
+      - surname
+
+  Task:
+    properties:
+      id:
+        type: integer
+      text:
+        type: string
+      answers:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            text:
+              type: string
+            correct:
+              type: boolean
+          required:
+            - text
+            - correct
+      shared:
+        type: array
+        items:
+          type: integer
+    required:
+      - text
+
+  TaskGroup:
+    properties:
+      name:
+        type: string
+      tasks:
+        type: array
+        items:
+          type: integer
+      shared:
+        type: array
+        items:
+          type: integer
+    required:
+      - name
+      - tasks
+
+  Class:
+    properties:
+      name:
+        type: string
+      users:
+        type: array
+        items:
+          type: integer
+    required:
+      - name
+      - users
+
+  Exam:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      taskGroup:
+        type: integer
+      mode:
+        type: string
+        enum: ["exam", "crowd sourcing"]
+      class:
+        type: integer
+      TA:
+        type: array
+        items:
+          type: integer
+      deadline:
+        type: string
+        format: date-time
+      duration:
+        type: integer
+      start:
+        type: string
+        format: date-time
+    required:
+      - taskGroup
+      - class
+      - deadline
+      - start
+
+  Submission:
+    properties:
+      answers:
+        type: array
+        items:
+          type: object
+          properties:
+            task:
+              type: integer
+            answer:
+              type: string
+            scelta:
+              type: integer
+          required:
+            - task
+    required:
+      - answers
