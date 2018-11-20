@@ -405,7 +405,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/Answer"
+              $ref: "#/definitions/Submission"
         400:
           description: Bad parameter
         403:
@@ -427,10 +427,10 @@ paths:
           minimum: 1
           description: Id of the exam
         - in: body
-          name: answers
+          name: submissions
           required: true
           schema:
-            $ref: "#/definitions/AnswerPost"
+            $ref: "#/definitions/SubmissionPost"
       tags:
         - "Exams"
       responses:
@@ -445,7 +445,7 @@ paths:
 
     # Modify answers to an exam
     put:
-      summary: "Modify answers of an exam"
+      summary: "Modify the answers of an exam"
       consumes:
         - application/json
       parameters:
@@ -456,10 +456,10 @@ paths:
           minimum: 1
           description: Id of the exam
         - in: body
-          name: answers
+          name: submissions
           required: true
           schema:
-            $ref: "#/definitions/Answer"
+            $ref: "#/definitions/Submission"
       tags:
         - "Exams"
       produces:
@@ -468,7 +468,7 @@ paths:
         200:
           description: Success, submitted
           schema:
-            $ref: "#/definitions/Answer"
+            $ref: "#/definitions/Submission"
         400:
           description: Bad parameter
         403:
@@ -828,6 +828,251 @@ paths:
         404:
           description: Task group does not exist
 
+###################################################################   PeerReview
+# Get 	/peer				vedo le peer review da fare/fatte/valutate
+# Get 	/peer/peer_id/tasks		vedo i task da correggere della peer specifica
+# Post	/peer/peer_id/review 		mando la review della peer specifica
+# Put					modifico la review specifica
+# Get					ottengo la review inviata precedentemente
+# Post	/peer/peer_id/evaluation 	invio la valutazione delle peer review riguardo all’esame specifico
+# Get				    	leggo la valutazione della peer review riguardo all’esame specifico
+# Put				    	modifico la valutazione della peer review riguardo all’esame specifico
+  /peer:
+    # Get list of PeerReviews
+    get:
+      summary: "Get peer reviews"
+      description: "Get a list of the peer reviews you have to do, done, to evaluate, evaluated"
+      tags:
+        - "Peer Reviews"
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              to_do:
+                type: array
+                items:
+                  type: integer
+              to_evaluate:
+                type: array
+                items:
+                  type: integer
+        400:
+          description: Bad parameters
+
+  /peer/{peer_id}/tasks:
+    # Get list of task in peer review
+    get:
+      summary: "Get the list of tasks of a peer review"
+      tags:
+        - "Peer Reviews"
+      parameters:
+        - in: path
+          name: peer_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the peer review
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Answer"
+        404:
+          description: Resource not found
+
+  /peer/{peer_id}/review:
+    # Get list of reviews
+    get:
+      summary: "Get the list of reviewed tasks"
+      description: "A student will get only his reviewed tasks. A TA will get them from the class"
+      parameters:
+        - in: path
+          name: peer_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the peer review
+      tags:
+        - "Peer Reviews"
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Review"
+        400:
+          description: Bad parameters
+        404:
+          description: Resource not found
+
+    # Create a review
+    post:
+      summary: "Create a review for the peer review"
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: peer_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the peer review
+        - in: body
+          name: review
+          required: true
+          schema:
+            $ref: "#/definitions/ReviewPost"
+      tags:
+        - "Peer Reviews"
+      responses:
+        201:
+          description: Success, resource created
+        400:
+          description: Bad parameters
+        404:
+          description: Resource not found
+
+    # Modify a review
+    put:
+      summary: "Modify a review for the peer review"
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: peer_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the peer review
+        - in: body
+          name: review
+          required: true
+          schema:
+            $ref: "#/definitions/Review"
+      tags:
+        - "Peer Reviews"
+      produces:
+        - application/json
+      responses:
+        201:
+          description: Success, resource created
+          schema:
+            $ref: "#/definitions/Review"
+        400:
+          description: Bad parameters
+        404:
+          description: Resource not found
+
+  /peer/{peer_id}/evaluation:
+    # Get the evaluation for a peer review
+    get:
+      summary: "View the evaluation of a peer review"
+      description: "View the evaluation of the specified peer review. If called by the exam creator returns every student's peer review"
+      parameters:
+        - in: path
+          name: peer_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the peer review
+      tags:
+        - "Peer Reviews"
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Evaluation"
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
+    # Evaluate an peer review's answers
+    post:
+      summary: "Submit an evaluation for a peer review"
+      description: "Submit an evaluation for a peer review"
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: peer_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the peer review
+        - in: body
+          name: evaluations
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/EvaluationPost"
+      tags:
+        - "Peer Reviews"
+      responses:
+        201:
+          description: Success
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
+    # Modify the evaluation for a peer review
+    put:
+      summary: "Modify an evaluation for a peer review"
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: peer_id
+          required: true
+          type: integer
+          minimum: 1
+          description: Id of the peer review
+        - in: body
+          name: evaluations
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Evaluation"
+      tags:
+        - "Peer Reviews"
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Evaluation"
+        400:
+          description: Bad parameter
+        403:
+          description: Permission denied
+        404:
+          description: Exam does not exist
+
 ##################################################################   Definitions
 definitions:
 
@@ -1097,7 +1342,7 @@ definitions:
             text:
               type: string
 
-  Answer:
+  Submission:
     type: object
     properties:
       user_id:
@@ -1116,7 +1361,7 @@ definitions:
               items:
                 type: integer
 
-  AnswerPost:
+  SubmissionPost:
     type: object
     properties:
       user_id:
@@ -1187,6 +1432,7 @@ definitions:
       - user_id
 
   PeerReview:
+    type: object
     properties:
       id:
         type: integer
@@ -1201,3 +1447,50 @@ definitions:
               type: integer
             comment:
               type: string
+
+  Review:
+    type: object
+    properties:
+      reviewer:
+        type: integer
+      reviews:
+        type: array
+        items:
+          type: object
+          properties:
+            task_id:
+              type: integer
+            comment:
+              type: string
+
+  ReviewPost:
+    type: object
+    properties:
+      reviewer:
+        type: integer
+      reviews:
+        type: array
+        items:
+          type: object
+          properties:
+            task_id:
+              type: integer
+            comment:
+              type: string
+          required:
+            - task_id
+            - comment
+    required:
+      - reviewer
+
+  Answer:
+    type: object
+    properties:
+      task_id:
+        type: integer
+      open_answer:
+        type: string
+      selected_answer:
+        type: array
+        items:
+          type: integer
