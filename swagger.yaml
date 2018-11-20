@@ -19,6 +19,7 @@ tags:
   - name: "Tasks"
   - name: "Classes"
   - name: "Task Groups"
+  - name: "Peer Reviews"
 
 paths:
 ########################################################################   Users
@@ -26,6 +27,14 @@ paths:
     # Sign Up
     post:
       summary: Register a new user
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          required: true
+          schema:
+            $ref: "#/definitions/UserPost"
       tags:
         - "User Management"
       responses:
@@ -45,11 +54,15 @@ paths:
           type: integer
           minimum: 1
           description: Id of the desired user
+      produces:
+        - application/json
       tags:
         - "User Management"
       responses:
         200:
           description: Success
+          schema:
+            $ref: "#/definitions/User"
         400:
           description: Bad parameter
         404:
@@ -58,18 +71,29 @@ paths:
     # Edit user details
     put:
       summary: Edit a user
+      consumes:
+        - application/json
       parameters:
         - in: path
           name: user_id
           required: true
           type: integer
           minimum: 1
-          description: Parameter description in Markdown.
+          description: "User id"
+        - in: body
+          name: user
+          required: true
+          schema:
+            $ref: "#/definitions/UserPut"
       tags:
         - "User Management"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            $ref: "#/definitions/User"
         400:
           description: Bad parameter
         403:
@@ -86,7 +110,7 @@ paths:
           required: true
           type: integer
           minimum: 1
-          description: Parameter description in Markdown.
+          description: The user id
       tags:
         - "User Management"
       responses:
@@ -359,9 +383,22 @@ paths:
       summary: "View tasks created by and shared with the logged user"
       tags:
         - "Tasks"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            type: object
+            properties:
+              created:
+                type: array
+                items:
+                  $ref: "#/definitions/Task"
+              shared:
+                type: array
+                items:
+                  $ref: "#/definitions/Task"
         400:
           description: Bad parameter
 
@@ -370,6 +407,14 @@ paths:
       summary: "Create a task"
       tags:
         - "Tasks"
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: task
+          required: true
+          schema:
+            $ref: "#/definitions/TaskPost"
       responses:
         201:
           description: Success, task has been created
@@ -389,9 +434,13 @@ paths:
           type: integer
           minimum: 1
           description: Id of the task
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            $ref: "#/definitions/Task"
         403:
           description: Permission denied
         404:
@@ -402,6 +451,8 @@ paths:
       summary: "Update a task"
       tags:
         - "Tasks"
+      consumes:
+        - application/json
       parameters:
         - in: path
           name: task_id
@@ -409,9 +460,18 @@ paths:
           type: integer
           minimum: 1
           description: Id of the task
+        - in: body
+          name: task
+          required: true
+          schema:
+            $ref: "#/definitions/TaskPut"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            $ref: "#/definitions/Task"
         403:
           description: Permission denied
         404:
@@ -444,9 +504,15 @@ paths:
       summary: "Get all classes"
       tags:
         - "Classes"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Class"
         403:
           description: Permission denied
 
@@ -455,20 +521,17 @@ paths:
       summary: "Create a group of students identified as a class"
       tags:
         - "Classes"
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: class
+          required: true
+          schema:
+            $ref: "#/definitions/ClassPost"
       responses:
         201:
           description: Success, created
-        400:
-          description: Bad parameters
-
-    # Update a class
-    put:
-      summary: "Update a class"
-      tags:
-        - "Classes"
-      responses:
-        200:
-          description: Success
         400:
           description: Bad parameters
 
@@ -485,17 +548,25 @@ paths:
           type: integer
           minimum: 1
           description: Id of the class
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            $ref: "#/definitions/Class"
         403:
           description: Permission denied
+        404:
+          description: Resource not found
 
     # Modify a specific class
     put:
       summary: "Modify a class"
       tags:
         - "Classes"
+      consumes:
+        - application/json
       parameters:
         - in: path
           name: class_id
@@ -503,9 +574,17 @@ paths:
           type: integer
           minimum: 1
           description: Id of the class
+        - in: body
+          name: class
+          schema:
+            $ref: "#/definitions/ClassPut"
+      produces:
+        - application/json
       responses:
         200:
           description: Success, created
+          schema:
+            $ref: "#/definitions/Class"
         400:
           description: Bad parameters
 
@@ -534,17 +613,40 @@ paths:
       summary: "Get task groups"
       tags:
         - "Task Groups"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            type: object
+            properties:
+              created:
+                type: array
+                items:
+                  $ref: "#/definitions/TaskGroup"
+              shared:
+                type: array
+                items:
+                  $ref: "#/definitions/TaskGroup"
         400:
           description: Bad parameters
+        404:
+          description: Resource not found
 
     # Create a Task Group
     post:
       summary: "Create a group of tasks"
       tags:
         - "Task Groups"
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: task_group
+          required: true
+          schema:
+            $ref: "#/definitions/TaskGroupPost"
       responses:
         201:
           description: Success, a task group has been created
@@ -564,9 +666,13 @@ paths:
           type: integer
           minimum: 1
           description: Id of the task group
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            $ref: "#/definitions/TaskGroup"
         400:
           description: Bad parameters
 
@@ -575,6 +681,8 @@ paths:
       summary: "Edit a task group"
       tags:
         - "Task Groups"
+      consumes:
+        - application/json
       parameters:
         - in: path
           name: task_group_id
@@ -582,9 +690,18 @@ paths:
           type: integer
           minimum: 1
           description: Id of the task group
+        - in: body
+          name: taksGroup
+          required: true
+          schema:
+            $ref: "#/definitions/TaskGroupPut"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            $ref: "#/definitions/TaskGroup"
         403:
           description: Permission denied
         404:
@@ -611,14 +728,26 @@ paths:
         404:
           description: Task group does not exist
 
-
 ##################################################################   Definitions
 definitions:
 
   User:
+    type: object
     properties:
       id:
         type: integer
+      email:
+        type: string
+      password:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+
+  UserPost:
+    type: object
+    properties:
       email:
         type: string
       password:
@@ -633,7 +762,20 @@ definitions:
       - name
       - surname
 
+  UserPut:
+    type: object
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+
   Task:
+    type: object
     properties:
       id:
         type: integer
@@ -650,17 +792,56 @@ definitions:
               type: string
             correct:
               type: boolean
+
+  TaskPost:
+    type: object
+    properties:
+      text:
+        type: string
+      answers:
+        type: array
+        items:
+          type: object
+          properties:
+            text:
+              type: string
+            correct:
+              type: boolean
           required:
             - text
             - correct
-      shared:
-        type: array
-        items:
-          type: integer
     required:
       - text
 
+  TaskPut:
+    type: object
+    properties:
+      text:
+        type: string
+      answers:
+        type: array
+        items:
+          type: object
+          properties:
+            text:
+              type: string
+            correct:
+              type: boolean
+
   TaskGroup:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      tasks:
+        type: array
+        items:
+          type: integer
+
+  TaskGroupPost:
+    type: object
     properties:
       name:
         type: string
@@ -668,15 +849,33 @@ definitions:
         type: array
         items:
           type: integer
-      shared:
+    required:
+      - name
+
+  TaskGroupPut:
+    type: object
+    properties:
+      name:
+        type: string
+      tasks:
         type: array
         items:
           type: integer
-    required:
-      - name
-      - tasks
 
   Class:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      users:
+        type: array
+        items:
+          type: integer
+
+  ClassPost:
+    type: object
     properties:
       name:
         type: string
@@ -686,7 +885,16 @@ definitions:
           type: integer
     required:
       - name
-      - users
+
+  ClassPut:
+    type: object
+    properties:
+      name:
+        type: string
+      users:
+        type: array
+        items:
+          type: integer
 
   Exam:
     properties:
@@ -714,6 +922,8 @@ definitions:
         type: string
         format: date-time
     required:
+      - name
+      - mode
       - taskGroup
       - class
       - deadline
@@ -731,8 +941,26 @@ definitions:
             answer:
               type: string
             scelta:
-              type: integer
+              type: array
+              items:
+                type: integer
           required:
             - task
     required:
       - answers
+
+  PeerReview:
+    properties:
+      id:
+        type: integer
+      tasks:
+        type: array
+        items:
+          type: object
+          properties:
+            task:
+              type: integer
+            user:
+              type: integer
+            comment:
+              type: string
