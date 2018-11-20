@@ -131,9 +131,26 @@ paths:
       description: "View both the exams you have created, the ones you can participate in and those you have completed"
       tags:
         - "Exams"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            type: object
+            properties:
+              created:
+                type: array
+                items:
+                  $ref: "#/definitions/Exam"
+              accessible:
+                type: array
+                items:
+                  $ref: "#/definitions/Exam"
+              evaluated:
+                type: array
+                items:
+                  $ref: "#/definitions/Exam"
 
     # Create an exam
     post:
@@ -141,11 +158,21 @@ paths:
       description: "Create an exam from a set of tasks"
       tags:
         - "Exams"
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: exam
+          required: true
+          schema:
+            $ref: "#/definitions/ExamPost"
       responses:
         201:
           description: Success, exam has been created
         400:
           description: Bad parameter
+        404:
+          description: Resource not found
 
   /exams/{exam_id}:
     # Info about an exam
@@ -160,9 +187,13 @@ paths:
           description: Id of the exam
       tags:
         - "Exams"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            $ref: "#/definitions/Exam"
         400:
           description: Bad parameter
         403:
@@ -180,11 +211,20 @@ paths:
           type: integer
           minimum: 1
           description: Id of the exam
+        - in: body
+          name: exam
+          required: true
+          schema:
+            $ref: "#/definitions/ExamPut"
       tags:
         - "Exams"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            $ref: "#/definitions/Exam"
         400:
           description: Bad parameter
         403:
@@ -228,9 +268,15 @@ paths:
           description: Id of the exam
       tags:
         - "Exams"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/ExamTask"
         400:
           description: Bad parameter
         403:
@@ -252,9 +298,15 @@ paths:
           description: Id of the exam
       tags:
         - "Exams"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Evaluation"
         400:
           description: Bad parameter
         403:
@@ -266,6 +318,8 @@ paths:
     post:
       summary: "Submit an evaluation for an exam"
       description: "Submit an evaluation for an exam"
+      consumes:
+        - application/json
       parameters:
         - in: path
           name: exam_id
@@ -273,6 +327,13 @@ paths:
           type: integer
           minimum: 1
           description: Id of the exam
+        - in: body
+          name: evaluations
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/EvaluationPost"
       tags:
         - "Exams"
       responses:
@@ -288,6 +349,8 @@ paths:
     # Modify the evaluation for an exam
     put:
       summary: "Modify an evaluation for an exam"
+      consumes:
+        - application/json
       parameters:
         - in: path
           name: exam_id
@@ -295,11 +358,24 @@ paths:
           type: integer
           minimum: 1
           description: Id of the exam
+        - in: body
+          name: evaluations
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Evaluation"
       tags:
         - "Exams"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Evaluation"
         400:
           description: Bad parameter
         403:
@@ -321,9 +397,15 @@ paths:
           description: Id of the exam
       tags:
         - "Exams"
+      produces:
+        - application/json
       responses:
         200:
           description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Answer"
         400:
           description: Bad parameter
         403:
@@ -335,6 +417,8 @@ paths:
     post:
       summary: "Send answers of an exam"
       description: "Send answers of an exam"
+      consumes:
+        - application/json
       parameters:
         - in: path
           name: exam_id
@@ -342,6 +426,11 @@ paths:
           type: integer
           minimum: 1
           description: Id of the exam
+        - in: body
+          name: answers
+          required: true
+          schema:
+            $ref: "#/definitions/AnswerPost"
       tags:
         - "Exams"
       responses:
@@ -357,6 +446,8 @@ paths:
     # Modify answers to an exam
     put:
       summary: "Modify answers of an exam"
+      consumes:
+        - application/json
       parameters:
         - in: path
           name: exam_id
@@ -364,11 +455,20 @@ paths:
           type: integer
           minimum: 1
           description: Id of the exam
+        - in: body
+          name: answers
+          required: true
+          schema:
+            $ref: "#/definitions/Answer"
       tags:
         - "Exams"
+      produces:
+        - application/json
       responses:
         200:
           description: Success, submitted
+          schema:
+            $ref: "#/definitions/Answer"
         400:
           description: Bad parameter
         403:
@@ -897,6 +997,7 @@ definitions:
           type: integer
 
   Exam:
+    type: object
     properties:
       id:
         type: integer
@@ -921,33 +1022,169 @@ definitions:
       start:
         type: string
         format: date-time
+
+  ExamPost:
+    type: object
+    properties:
+      name:
+        type: string
+      taskGroup:
+        type: integer
+      mode:
+        type: string
+        enum: ["exam", "crowd sourcing"]
+      class:
+        type: integer
+      TA:
+        type: array
+        items:
+          type: integer
+      deadline:
+        type: string
+        format: date-time
+      duration:
+        type: integer
+      start:
+        type: string
+        format: date-time
     required:
       - name
-      - mode
       - taskGroup
+      - mode
       - class
       - deadline
       - start
 
-  Submission:
+  ExamPut:
+    type: object
     properties:
+      name:
+        type: string
+      taskGroup:
+        type: integer
+      mode:
+        type: string
+        enum: ["exam", "crowd sourcing"]
+      class:
+        type: integer
+      TA:
+        type: array
+        items:
+          type: integer
+      deadline:
+        type: string
+        format: date-time
+      duration:
+        type: integer
+      start:
+        type: string
+        format: date-time
+
+  ExamTask:
+    type: object
+    properties:
+      id:
+        type: integer
+      text:
+        type: string
       answers:
         type: array
         items:
           type: object
           properties:
-            task:
+            id:
               type: integer
-            answer:
+            text:
               type: string
-            scelta:
+
+  Answer:
+    type: object
+    properties:
+      user_id:
+        type: integer
+      answers:
+        type: array
+        items:
+          type: object
+          properties:
+            task_id:
+              type: integer
+            open_answer:
+              type: string
+            selected_answer:
+              type: array
+              items:
+                type: integer
+
+  AnswerPost:
+    type: object
+    properties:
+      user_id:
+        type: integer
+      answers:
+        type: array
+        items:
+          type: object
+          properties:
+            task_id:
+              type: integer
+            open_answer:
+              type: string
+            selected_answer:
               type: array
               items:
                 type: integer
           required:
-            - task
+            - task_id
     required:
-      - answers
+      - user_id
+
+  Evaluation:
+    type: object
+    properties:
+      user_id:
+        type: integer
+      comment:
+        type: string
+      mark:
+        type: integer
+      tasks:
+        type: array
+        items:
+          type: object
+          properties:
+            task_id:
+              type: integer
+            comment:
+              type: string
+            mark:
+              type: integer
+
+  EvaluationPost:
+    type: object
+    properties:
+      user_id:
+        type: integer
+      comment:
+        type: string
+      mark:
+        type: integer
+      tasks:
+        type: array
+        items:
+          type: object
+          properties:
+            task_id:
+              type: integer
+            comment:
+              type: string
+            mark:
+              type: integer
+          required:
+            - task_id
+            - mark
+    required:
+      - user_id
 
   PeerReview:
     properties:
