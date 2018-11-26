@@ -9,22 +9,40 @@ function register_endpoint(app) {
 }
 
 function create_user(req, res) {
-    /*
-    var surname = req.body['surname'];
-    var name = req.body['name'];
-    var mail = req.body['email'];
-    var password = req.body['password'];
-    */
-    console.log(req.body['name']);
+
+    function check_format(body) {
+        if("name" in body && "surname" in body && "email" in body && "password" in body) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     
     DB.edit_data((data) => {
-        if(typeof data['users'] == 'undefined') data['users'] = Array();
-        data['users'].push(req.body);
-        return data;
+
+        var check = check_format(req.body);
+
+        if(!check) {
+            res.statusCode = 400;
+            console.log('Invalid parameters');
+        } else {
+            var id;
+
+            if(typeof data['users'] == 'undefined') {
+                data['users'] = [];
+                id = 0;
+            } else {
+                id = Object.keys(data['users']).sort().length+1;
+            }
+    
+            data['users'].push({key: id, value: req.body});
+            res.statusCode = 201;
+            console.log('New user created');
+        }
+        
     });
-    
-    res.send('Create user function');
-    
+
+    res.send();
 }
 
 module.exports = {register_endpoint, create_user};
