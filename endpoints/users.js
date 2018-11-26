@@ -10,6 +10,8 @@ function register_endpoint(app) {
 
 function create_user(req, res) {
 
+    var id = -1;
+
     function check_format(body) {
         if("name" in body && "surname" in body && "email" in body && "password" in body) {
             return true;
@@ -27,9 +29,6 @@ function create_user(req, res) {
             res.statusCode = 400;
             console.log('Invalid parameters');
         } else {
-            //valid parameters
-            var id;
-
             //check if it's the first user
             if(typeof data['users'] == 'undefined') {
                 data['users'] = [];
@@ -46,8 +45,12 @@ function create_user(req, res) {
         }
         
     });
-
-    res.send();
+    
+    if(id == -1){
+        res.send('Invalid parameters');
+    } else {
+        res.send(String(id));
+    }
 }
 
 module.exports = {register_endpoint, create_user};
