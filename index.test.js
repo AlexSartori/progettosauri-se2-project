@@ -1,3 +1,4 @@
+/*
 const fetch = require('node-fetch');
 
 const app = require('./index').app;
@@ -16,3 +17,4 @@ test('Hello World test', () => {
 });
 
 afterAll(() => server.close());
+*/
