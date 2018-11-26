@@ -854,10 +854,12 @@ paths:
             properties:
               to_do:
                 type: array
+                description: "List of id of peer reviews to do as a student"
                 items:
                   type: integer
               to_evaluate:
                 type: array
+                description: "List of id of peer reviews to evaluate as a TA"
                 items:
                   type: integer
         400:
@@ -1081,26 +1083,35 @@ definitions:
     properties:
       id:
         type: integer
+        description: "Identifier of the user"
       email:
         type: string
+        description: "Email of the user"
       password:
         type: string
+        description: "Password of the user"
       name:
         type: string
+        description: "Name of the user"
       surname:
         type: string
+        description: "Surname of the user"
 
   UserPost:
     type: object
     properties:
       email:
         type: string
+        description: "Email of the user"
       password:
         type: string
+        description: "Password of the user"
       name:
         type: string
+        description: "Name of the user"
       surname:
         type: string
+        description: "Surname of the user"
     required:
       - email
       - password
@@ -1112,46 +1123,62 @@ definitions:
     properties:
       email:
         type: string
+        description: "Email of the user"
       password:
         type: string
+        description: "Password of the user"
       name:
         type: string
+        description: "Name of the user"
       surname:
         type: string
+        description: "Surname of the user"
 
   Task:
     type: object
     properties:
       id:
         type: integer
+        description: "Identifier of the task"
       text:
         type: string
+        description: "The question of the task"
       answers:
         type: array
+        description: "List of possible answers. If it contains less than two answers the task will be an open answer task, otherwise a multiple chioce task"
         items:
           type: object
+          description: "A single answer, it can be an open answer or a multiple choice answer"
           properties:
             id:
               type: integer
+              description: "Identifier of the answer"
             text:
               type: string
+              description: "The text of the answer"
             correct:
               type: boolean
+              description: "Correctness of the answer"
 
   TaskPost:
     type: object
     properties:
       text:
         type: string
+        description: "The question of the task"
       answers:
         type: array
+        description: "List of possible answers. If it contains less than two answers the task will be an open answer task, otherwise a multiple chioce task"
         items:
           type: object
+          description: "A single answer, it can be an open answer or a multiple choice answer"
           properties:
             text:
               type: string
+              description: "The text of the answer"
             correct:
               type: boolean
+              description: "Correctness of the answer"
           required:
             - text
             - correct
@@ -1163,37 +1190,49 @@ definitions:
     properties:
       text:
         type: string
+        description: "The question of the task"
       answers:
         type: array
+        description: "List of possible answers. If it contains less than two answers the task will be an open answer task, otherwise a multiple chioce task"
         items:
           type: object
+          description: "A single answer, it can be an open answer or a multiple choice answer"
           properties:
             text:
               type: string
+              description: "The text of the answer"
             correct:
               type: boolean
+              description: "Correctness of the answer"
 
   TaskGroup:
     type: object
     properties:
       id:
         type: integer
+        description: "Identifier of the task group"
       name:
         type: string
+        description: "Name of the task group"
       tasks:
         type: array
+        description: "List of id of tasks which belong to the task group"
         items:
           type: integer
+          description: "Id which identifies a specific task"
 
   TaskGroupPost:
     type: object
     properties:
       name:
         type: string
+        description: "Name of the task group"
       tasks:
         type: array
+        description: "List of id of tasks which belong to the task group"
         items:
           type: integer
+          description: "Id which identifies a specific task"
     required:
       - name
 
@@ -1202,32 +1241,42 @@ definitions:
     properties:
       name:
         type: string
+        description: "Name of the task group"
       tasks:
         type: array
+        description: "List of id of tasks which belong to the task group"
         items:
           type: integer
+          description: "Id which identifies a specific task"
 
   Class:
     type: object
     properties:
       id:
         type: integer
+        description: "Identifier of the class"
       name:
         type: string
+        description: "Name of the class"
       users:
         type: array
+        description: "List of id of the users which belong to the class"
         items:
           type: integer
+          description: "Id which identifies a specific user"
 
   ClassPost:
     type: object
     properties:
       name:
         type: string
+        description: "Name of the class"
       users:
         type: array
+        description: "List of id of the users which belong to the class"
         items:
           type: integer
+          description: "Id which identifies a specific user"
     required:
       - name
 
@@ -1236,62 +1285,84 @@ definitions:
     properties:
       name:
         type: string
+        description: "Name of the class"
       users:
         type: array
+        description: "List of id of the users which belong to the class"
         items:
           type: integer
+          description: "Id which identifies a specific user"
 
   Exam:
     type: object
     properties:
       id:
         type: integer
+        description: "Id of the exam"
       name:
         type: string
+        description: "Name of the exam"
       taskGroup:
         type: integer
+        description: "Id of the taskGroup used in the exam"
       mode:
         type: string
         enum: ["exam", "crowd sourcing"]
+        description: "If the value is exam the user has to answer all the tasks that belong in the taskGroup, otherwise every user has a different set of tasks"
       class:
         type: integer
+        description: "Id of the class that has to answer the exam"
       TA:
         type: array
+        description: "List of id of TA's to whom the exam has been shared"
         items:
           type: integer
+          description: "Id of TA"
       deadline:
         type: string
         format: date-time
+        description: "Expiring date of the exam"
       duration:
         type: integer
+        description: "Number of minutes given to complete the exam"
       start:
         type: string
         format: date-time
+        description: "Starting date of the exam"
 
   ExamPost:
     type: object
     properties:
       name:
         type: string
+        description: "Name of the exam"
       taskGroup:
         type: integer
+        description: "Id of the taskGroup used in the exam"
       mode:
         type: string
         enum: ["exam", "crowd sourcing"]
+        description: "If the value is exam the user has to answer all the tasks that belong in the taskGroup, otherwise every user has a different set of tasks"
       class:
         type: integer
+        description: "Id of the class that has to answer the exam"
       TA:
         type: array
+        description: "List of id of TA's to whom the exam has been shared"
         items:
           type: integer
+          description: "Id of TA"
       deadline:
         type: string
         format: date-time
+        description: "Expiring date of the exam"
       duration:
         type: integer
+        description: "Number of minutes given to complete the exam"
       start:
         type: string
         format: date-time
+        description: "Starting date of the exam"
     required:
       - name
       - taskGroup
@@ -1305,80 +1376,109 @@ definitions:
     properties:
       name:
         type: string
+        description: "Name of the exam"
       taskGroup:
         type: integer
+        description: "Id of the taskGroup used in the exam"
       mode:
         type: string
         enum: ["exam", "crowd sourcing"]
+        description: "If the value is exam the user has to answer all the tasks that belong in the taskGroup, otherwise every user has a different set of tasks"
       class:
         type: integer
+        description: "Id of the class that has to answer the exam"
       TA:
         type: array
+        description: "List of id of TA's to whom the exam has been shared"
         items:
           type: integer
+          description: "Id of TA"
       deadline:
         type: string
         format: date-time
+        description: "Expiring date of the exam"
       duration:
         type: integer
+        description: "Number of minutes given to complete the exam"
       start:
         type: string
         format: date-time
+        description: "Starting date of the exam"
 
   ExamTask:
     type: object
     properties:
       id:
         type: integer
+        description: "Identifier of the exam task"
       text:
         type: string
+        description: "The question of the exam task"
       answers:
         type: array
+        description: "List of possible answers. If it contains less than two answers the task will be an open answer task, otherwise a multiple chioce task"
         items:
           type: object
+          description: "A single answer, it can be an open answer or a multiple choice answer"
           properties:
             id:
               type: integer
+              description: "Identifier of the answer"
             text:
               type: string
+              description: "The text of the answer"
 
   Submission:
     type: object
     properties:
       user_id:
         type: integer
+        description: "Identifier of the user who answered the questions"
       answers:
         type: array
+        description: "List of answers of the user"
         items:
           type: object
+          description: "Answer of the user. It can be an open answer or a multiple choice answer"
           properties:
             task_id:
               type: integer
+              description: "The task's id to which the answer refers"
             open_answer:
               type: string
+              description: "The text of the open answer given by the user"
             selected_answer:
               type: array
+              description : "List of id of the choices selected by the user"
               items:
                 type: integer
+                description: "Id of the single choice"
 
   SubmissionPost:
     type: object
     properties:
       user_id:
         type: integer
+        description: "Identifier of the user who answered the questions"
       answers:
         type: array
+        description: "List of answers of the user"
         items:
           type: object
+          description: "Answer of the user. It can be an open answer or a multiple choice answer"
           properties:
             task_id:
               type: integer
+              description: "The task's id to which the answer refers"
             open_answer:
               type: string
+              description: "The text of the open answer given by the user"
             selected_answer:
               type: array
+              description : "List of id of the choices selected by the user"
               items:
                 type: integer
+                description: "Id of the single choice"
           required:
             - task_id
     required:
@@ -1389,94 +1489,103 @@ definitions:
     properties:
       user_id:
         type: integer
+        description: "Id of the user who took the exam"
       comment:
         type: string
+        description: "Comment of the TA about the exam"
       mark:
         type: integer
+        description: "Mark of the TA about the exam"
       tasks:
         type: array
+        description: "List of tasks in the exam"
         items:
           type: object
+          description: "Single task"
           properties:
             task_id:
               type: integer
+              description: "Id of the task"
             comment:
               type: string
+              description: "Comment of the specific task"
             mark:
               type: integer
+              description: "Mark of the specific task"
 
   EvaluationPost:
     type: object
     properties:
       user_id:
         type: integer
+        description: "Id of the user who took the exam"
       comment:
         type: string
+        description: "Comment of the TA about the exam"
       mark:
         type: integer
+        description: "Mark of the TA about the exam"
       tasks:
         type: array
+        description: "List of tasks in the exam"
         items:
           type: object
+          description: "Single task"
           properties:
             task_id:
               type: integer
+              description: "Id of the task"
             comment:
               type: string
+              description: "Comment of the specific task"
             mark:
               type: integer
+              description: "Mark of the specific task"
           required:
             - task_id
             - mark
     required:
       - user_id
 
-  PeerReview:
-    type: object
-    properties:
-      id:
-        type: integer
-      tasks:
-        type: array
-        items:
-          type: object
-          properties:
-            task:
-              type: integer
-            user:
-              type: integer
-            comment:
-              type: string
-
   Review:
     type: object
     properties:
       reviewer:
         type: integer
+        description: "Id of the user who is evaluating the tasks"
       reviews:
         type: array
+        description: "List of the reviews of each task"
         items:
           type: object
+          description: "Single task review"
           properties:
             task_id:
               type: integer
+              description: "Identifier of the specific task"
             comment:
               type: string
+              description: "Comment of the specific task"
 
   ReviewPost:
     type: object
     properties:
       reviewer:
         type: integer
+        description: "Id of the user who is evaluating the tasks"
       reviews:
         type: array
+        description: "List of the reviews of each task"
         items:
           type: object
+          description: "Single task review"
           properties:
             task_id:
               type: integer
+              description: "Identifier of the specific task"
             comment:
               type: string
+              description: "Comment of the specific task"
           required:
             - task_id
             - comment
@@ -1488,9 +1597,13 @@ definitions:
     properties:
       task_id:
         type: integer
+        description: "The task's id to which the answer refers"
       open_answer:
         type: string
+        description: "The text of the open answer given by the user"
       selected_answer:
         type: array
+        description : "List of id of the choices selected by the user"
         items:
           type: integer
+          description: "Id of the single choice"
