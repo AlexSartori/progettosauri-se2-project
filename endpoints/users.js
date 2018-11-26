@@ -19,22 +19,27 @@ function create_user(req, res) {
     }
     
     DB.edit_data((data) => {
-
+        //check the required parameters
         var check = check_format(req.body);
 
         if(!check) {
+            //not valid parameters
             res.statusCode = 400;
             console.log('Invalid parameters');
         } else {
+            //valid parameters
             var id;
 
+            //check if it's the first user
             if(typeof data['users'] == 'undefined') {
                 data['users'] = [];
                 id = 0;
             } else {
+                //if it's not the first, get the last ID assigned and create a new ID
                 id = Object.keys(data['users']).sort().length+1;
             }
-    
+            
+            //save the data in the database
             data['users'].push({key: id, value: req.body});
             res.statusCode = 201;
             console.log('New user created');
