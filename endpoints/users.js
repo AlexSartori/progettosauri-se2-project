@@ -43,7 +43,7 @@ function create_user(req, res) {
 
         //send status code
         res.statusCode = 201;
-        res.send(String(id));
+        res.send(JSON.stringify({id: String(id)}));
     }
 }
 
