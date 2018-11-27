@@ -51,7 +51,6 @@ function create_class(req, res) {
   res.send();
 }
 
-<<<<<<< cb0c7b20fff393047b9309e9612740f99be63e77
 function get_classes(req, res) {
   let user = parseInt(req.get('user'));
   let status = 200;
@@ -79,7 +78,7 @@ function get_classes(req, res) {
 }
 
 module.exports = {register_endpoints, create_class, get_classes};
-=======
+
 function delete_class(req, res) {
   let class_id = req.params.class_id;
   let user = parseInt(req.get('user'));
@@ -111,4 +110,3 @@ function delete_class(req, res) {
 }
 
 module.exports = {register_endpoints, create_class, delete_class};
->>>>>>> add implementation and test of delete_class
