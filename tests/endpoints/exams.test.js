@@ -9,7 +9,19 @@ const BASE_URL = `http://localhost:${PORT}/`;
 
 beforeAll(() => {
   process.env.TESTING = true;
-  fs.writeFileSync(DB.DB_TEST_PATH, "{}");
+  fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify({
+      key: 0,
+      value: {
+          name: 'Exam #1',
+          taskGroup: 121,
+          mode: 'crowd sourcing',
+          class: 18,
+          TA: [12],
+          deadline: '2019-01-15 23:59',
+          duration: 120,
+          start: '2019-01-15 00:00'
+      }
+  }));
 });
 
 test("Successfully create Exam", () => {
@@ -53,6 +65,34 @@ test("Fail create Exam with [400 Bad Parameters]", () => {
     }).then(res => {
         expect(res.status).toEqual(400);
         return res.text();
+    });
+});
+
+test("Get existing Exam", () => {
+    test_exam = {
+        name: 'Exam #1',
+        taskGroup: 121,
+        mode: 'crowd sourcing',
+        class: 18,
+        TA: [12],
+        deadline: '2019-01-15 23:59',
+        duration: 120,
+        start: '2019-01-15 00:00'
+    };
+
+    fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify({
+            key: 0,
+            value: test_exam
+    }));
+
+    expect.assertions(1);
+    return fetch(BASE_URL + "exams")
+    .then(res => {
+        expect(res.status).toEqual(200);
+        return res.text();
+    }).then(res => {
+        test_exam.id = 0;
+        expect(JSON.parse(res)).toEqual(test_exam);
     });
 });
 
