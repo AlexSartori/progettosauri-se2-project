@@ -705,6 +705,10 @@ paths:
           description: Success
         400:
           description: Bad parameters
+        403:
+          description: Permission denied
+        404:
+          description: Resource not found
 
 ##################################################################   Task Groups
   /task_groups:

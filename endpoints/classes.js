@@ -3,6 +3,7 @@ const DB = require('../DinoBase');
 function register_endpoints(app) {
   app.post('/classes', create_class);
   app.get('/classes', get_classes);
+  app.delete('/classes/:class_id', delete_class);
 }
 
 function create_class(req, res) {
@@ -50,6 +51,7 @@ function create_class(req, res) {
   res.send();
 }
 
+<<<<<<< cb0c7b20fff393047b9309e9612740f99be63e77
 function get_classes(req, res) {
   let user = parseInt(req.get('user'));
   let status = 200;
@@ -77,3 +79,36 @@ function get_classes(req, res) {
 }
 
 module.exports = {register_endpoints, create_class, get_classes};
+=======
+function delete_class(req, res) {
+  let class_id = req.params.class_id;
+  let user = parseInt(req.get('user'));
+  let status;
+
+  if (user != NaN){
+
+    DB.edit_data(data => {
+
+      if (data.users[user] != undefined) {
+
+        if (data.classes[class_id] != undefined) {
+
+          if(data.classes[class_id].creator == user){
+            status = 200;
+            delete data.classes[class_id];
+          } else
+            status = 403;
+        } else
+          status = 404;
+      } else
+        status = 400;
+    });
+  }else
+    status = 400;
+
+  res.status(status);
+  res.send('');
+}
+
+module.exports = {register_endpoints, create_class, delete_class};
+>>>>>>> add implementation and test of delete_class

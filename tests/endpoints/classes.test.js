@@ -26,9 +26,15 @@ beforeAll(() => {
         'name': 'other_test_user',
         'mail': 'other_mail@test.com',
         'password': 'test'
+      },
+      '2': {
+        'id': 2,
+        'name': 'other_test_user2',
+        'mail': 'other_mail2@test.com',
+        'password': 'test'
       }
     },
-    'users_next_id': 2
+    'users_next_id': 3
   }));
 });
 
@@ -129,6 +135,7 @@ test('failing_create_class_no_name_string', () => {
   });
 });
 
+
 // GET /classes
 test('register_endpoints_get', () => {
   expect.assertions(1);
@@ -166,4 +173,77 @@ test('successful_get_classes_empty', () => {
   .then(res => {
     expect(JSON.parse(res)).toEqual([]);
   })
+
+test('failing delete class user not specified', () => {
+  expect.assertions(1);
+  return fetch(BASE_URL + '/0', {
+    method: 'DELETE'
+  })
+  .then(res => {
+    expect(res.status).toBe(400);
+  });
+});
+
+test('failing delete class user not existing', () => {
+  expect.assertions(2);
+  return fetch(BASE_URL + '/0', {
+    method: 'DELETE',
+    headers: {
+      'user': 100
+    }
+  })
+  .then(res => {
+    expect(res.status).toBe(400);
+       DB.edit_data(data => {
+         expect(data.users[100]).toBe(undefined);
+      });
+  });
+});
+
+test('failing delete class not existing', () => {
+  expect.assertions(2);
+  return fetch(BASE_URL + '/5', {
+    method: 'DELETE',
+    headers: {
+      'user': 2
+    }
+  })
+  .then(res => {
+    expect(res.status).toBe(404);
+      DB.edit_data(data => {
+       expect(data.classes[5]).toBe(undefined);
+     });
+  });
+});
+
+test('failing delete class no permission', () => {
+  expect.assertions(2);
+  return fetch(BASE_URL + '/0', {
+    method: 'DELETE',
+    headers: {
+      'user': 2
+    }
+  })
+  .then(res => {
+    expect(res.status).toBe(403);
+      DB.edit_data(data => {
+       expect(data.classes[0].creator).toBe(0);
+     });
+  });
+});
+
+test('successful delete class', () => {
+  expect.assertions(2);
+  return fetch(BASE_URL + '/0', {
+    method: 'DELETE',
+    headers: {
+      'user': 0
+    }
+  })
+  .then(res => {
+    expect(res.status).toBe(200);
+     DB.edit_data(data => {
+      expect(data.classes[0]).toBe(undefined);
+    });
+  });
 });
