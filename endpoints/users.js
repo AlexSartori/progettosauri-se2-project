@@ -3,6 +3,7 @@ const DB = require('../DinoBase');
 function register_endpoints(app) {
     app.post('/users', create_user);
     app.get('/users/:user_id', get_user_details);
+    app.delete('/users/:user_id', delete_user);
 }
 
 function create_user(req, res) {
@@ -61,10 +62,12 @@ function get_user_details(req, res){
         DB.edit_data((data) => {
             //check if the user exists
             found = false
-            for(i in data['users']){
-                if (data['users'][i].key == req.params.user_id){
-                    found = true
-                    res.status(200).send(data['users'][i])
+           if(data['users']){
+                for(i in data['users']){
+                    if (data['users'][i].key == req.params.user_id){
+                        found = true
+                        res.status(200).send(data['users'][i])
+                    }
                 }
             }
             if(!found){
@@ -75,4 +78,41 @@ function get_user_details(req, res){
     }
 }
 
-module.exports = {register_endpoints, create_user, get_user_details};
+function delete_user(req, res){ 
+    function check_parameter(id){
+        if (id < 0 || isNaN(parseInt(id, 10))) {
+            return false
+        } else {
+            return true}
+    }
+
+    var check = check_parameter(req.params.user_id)
+    //var checkH = check_header(req.get('user'))
+
+    if (!check){
+        res.status(400).send("Bad parameter, user_id should be a positive integer")
+    } else {
+        //check permissions
+        if (req.get('user') !== req.params.user_id){
+            res.status(403).send("Permission denied, you are trying to delete an other user's account")
+        } else { 
+            DB.edit_data((data) => {
+                //check if the user exists
+                found = false
+                for(i in data['users']){
+                    if (data['users'][i].key == req.params.user_id){
+                        found = true
+                        data['users'].splice(i,1)
+                        res.status(200).send("Success, account has been deleted")
+                    }
+                }
+                if(!found){
+                    res.status(404).send("User does not exist")
+                }
+            });
+        }   
+    
+    }
+}
+
+module.exports = {register_endpoints, create_user, get_user_details, delete_user };
