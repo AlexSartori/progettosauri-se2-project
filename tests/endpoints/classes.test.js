@@ -134,6 +134,36 @@ test('register_endpoints_get', () => {
   expect.assertions(1);
   return fetch(BASE_URL, {method: 'GET'})
   .then(res => {
-    expect(res.status).toEqual(200);
+    expect(res.status).toEqual(400);
   });
+});
+
+test('successful_get_classes', () => {
+  expect.assertions(2);
+  return fetch(BASE_URL, {
+    method: 'GET',
+    headers: {'user': 0}
+  })
+  .then(res => {
+    expect(res.status).toEqual(200);
+    return res.text();
+  })
+  .then(res => {
+    expect(JSON.parse(res)).toEqual([{name:'Test class',creator:0,users:[1],id:0}]);
+  });
+});
+
+test('successful_get_classes_empty', () => {
+  expect.assertions(2);
+  return fetch(BASE_URL, {
+    method: 'GET',
+    headers: {'user': 1}
+  })
+  .then(res => {
+    expect(res.status).toEqual(200);
+    return res.text();
+  })
+  .then(res => {
+    expect(JSON.parse(res)).toEqual([]);
+  })
 });

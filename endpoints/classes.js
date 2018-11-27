@@ -32,6 +32,7 @@ function create_class(req, res) {
             new_class.users.push(class_member);
           }
         });
+        new_class.users = new_class.users.sort();
       }
 
       // Writes in the DB
@@ -50,8 +51,29 @@ function create_class(req, res) {
 }
 
 function get_classes(req, res) {
-  res.status(200);
-  res.send('');
+  let user = parseInt(req.get('user'));
+  let status = 200;
+  let response = '';
+
+  if (user != NaN)
+    DB.edit_data(data => {
+      if (data.users[user] != undefined) {
+        response = [];
+        for (var id in data.classes)
+          if (data.classes.hasOwnProperty(id))
+            if (data.classes[id].creator == user)
+              response.push(data.classes[id]);
+        response = JSON.stringify(response);
+      }
+      else {
+        status = 400;
+      }
+    });
+  else
+    status = 400;
+
+  res.status(status);
+  res.send(response);
 }
 
 module.exports = {register_endpoints, create_class, get_classes};
