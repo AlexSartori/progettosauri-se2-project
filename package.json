@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/AlexSartori/progettosauri-se2-project#readme",
   "dependencies": {
+    "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "node-fetch": "^2.3.0"
   },
