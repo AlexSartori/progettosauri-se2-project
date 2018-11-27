@@ -2,6 +2,28 @@ const DB = require('../DinoBase');
 
 function register_endpoints(app) {
     app.post('/exams', create_exam);
+    app.get('/exams/:exam_id', get_exam);
+}
+
+function get_exam(req, res) {
+    let found = false;
+
+    DB.edit_data((data) => {
+        if (!data['exams']) return;
+
+        data['exams'].forEach((e) => {
+            if (e.key == req.params.exam_id)
+                found = e;
+        });
+    });
+
+    if (found) {
+        let exam = found.value;
+        exam.id = found.key;
+        res.status(200).send(JSON.stringify(exam));
+    } else {
+        res.status(404).send("No such exam");
+    }
 }
 
 function create_exam(req, res) {
