@@ -56,9 +56,74 @@ test("Create invalid exam", () => {
     });
 });
 
+test("Successfully modify Exam", () => {
+    let EXAM_ID = 0;
+    let test_exam = {
+        name: 'Test Exam',
+        taskGroup: 0,
+        mode: 'exam',
+        class: 5,
+        TA: [2, 12, 6],
+        deadline: '2018-12-21 20:00',
+        duration: 120,
+        start: '2018-12-15 08:00'
+    };
+
+    fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify({
+        exams: [{
+            key: EXAM_ID,
+            value: test_exam
+        }]
+    }));
+
+    test_exam.id = EXAM_ID;
+    // Modify exam
+    test_exam.name = "New Name";
+    test_exam.class = 18;
+    test_exam.TA.push(113);
+
+    expect.assertions(2);
+    return fetch(BASE_URL + "exams", {
+        method: 'put',
+        body: JSON.stringify(test_exam),
+        headers: { 'Content-Type': 'application/json' }
+    }).then(res => {
+        expect(res.status).toEqual(200);
+        return res.text();
+    }).then(() => {
+        DB.edit_data((data) => {
+            expect(data['exams'][0].value).toEqual(test_exam);
+        })
+    });
+});
+
+test("Modify non-existing Exam", () => {
+    let test_exam = {
+        id: 12345,
+        name: 'Non-Existing Exam',
+        taskGroup: 0,
+        mode: 'exam',
+        class: 5,
+        TA: [2, 12, 6],
+        deadline: '2018-12-21 20:00',
+        duration: 120,
+        start: '2018-12-15 08:00'
+    };
+
+    expect.assertions(1);
+    return fetch(BASE_URL + "exams", {
+        method: 'put',
+        body: JSON.stringify(test_exam),
+        headers: { 'Content-Type': 'application/json' }
+    }).then(res => {
+        expect(res.status).toEqual(404);
+        return res.text();
+    });
+});
+
 test("Get existing Exam", () => {
     let EXAM_ID = 0;
-    test_exam = {
+    let test_exam = {
         name: 'Exam #1',
         taskGroup: 121,
         mode: 'crowd sourcing',
