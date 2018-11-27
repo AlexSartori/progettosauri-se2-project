@@ -1,47 +1,35 @@
+const DB = require('../DinoBase');
 
 function register_endpoints(app) {
     app.post('/exams', create_exam);
 }
 
 function create_exam(req, res) {
-    res.status(201);
-    res.send("OK");
-    
-    /*function check_format(body) {
-        if("name" in body && "surname" in body && "email" in body && "password" in body) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    // Check validity
+    let param = req.body, valid = true;
+    valid &= param.name != undefined && typeof(param.name) == 'string';
+    valid &= param.taskGroup != undefined && typeof(param.taskGroup) == 'number';
+    valid &= param.mode != undefined && typeof(param.mode) == 'string' && (param.mode == 'exam' || param.mode == 'crowd sourcing');
+    valid &= param.class != undefined && typeof(param.class) == 'number';
+    valid &= param.TA != undefined && typeof(param.TA) == 'object' && param.TA.length > 0;
+    if (valid) param.TA.forEach((ta) => { valid &= typeof(ta) == 'number' });
+    valid &= new Date(param.deadline).toString() !== "Invalid Date";
+    valid &= param.duration != undefined && typeof(param.duration) == 'number';
+    valid &= new Date(param.start).toString() !== "Invalid Date";
 
-    //check the required parameters
-    var check = check_format(req.body);
-
-    if(!check) {
-        //not valid parameters
-        res.statusCode = 400;
-        res.send('Invalid parameters');
+    if (!valid) {
+        res.status(400).send();
     } else {
-        var id;
         DB.edit_data((data) => {
-            //check if it's the first user
-            if(typeof data['users'] == 'undefined') {
-                data['users'] = [];
-                id = 0;
-            } else {
-                //if it's not the first, get the last ID assigned and create a new ID
-                id = Object.keys(data['users']).sort().length+1;
-            }
-
-            //save the data in the database
-            data['users'].push({key: id, value: req.body});
+            if(typeof data['exams'] == 'undefined') data['exams'] = [];
+            next_id = Object.keys(data['exams']).sort().length+1;
+            new_exam = param;
+            new_exam.id = next_id;
+            data['exams'].push({key: next_id, value: new_exam});
         });
 
-        //send status code
-        res.statusCode = 201;
-        res.send(JSON.stringify({id: String(id)}));
-    }*/
+        res.status(201).send('' + next_id);
+    }
 }
 
 module.exports = {register_endpoints};

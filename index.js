@@ -17,7 +17,5 @@ fs.readdirSync(endpoints_dir).forEach((file) => {
 
 server = app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
 
-register_endpoints = require('./endpoints/exams').register_endpoints;
-register_endpoints(app);
 
 module.exports = {app, PORT, server};
