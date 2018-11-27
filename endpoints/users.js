@@ -2,6 +2,7 @@ const DB = require('../DinoBase');
 
 function register_endpoints(app) {
     app.post('/users', create_user);
+    app.get('/users/:user_id', get_user_details);
 }
 
 function create_user(req, res) {
