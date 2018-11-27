@@ -43,4 +43,35 @@ function create_user(req, res) {
     }
 }
 
-module.exports = {register_endpoints, create_user};
+function get_user_details(req, res){
+
+    function check_parameter(id){
+        if (id < 0 || isNaN(parseInt(id, 10))) {
+            return false
+        } else {
+            return true}
+    }
+
+    var check = check_parameter(req.params.user_id)
+
+    if (!check){
+        res.status(400).send("Bad parameter, user_id should be a positive integer")
+    } else {
+        DB.edit_data((data) => {
+            //check if the user exists
+            found = false
+            for(i in data['users']){
+                if (data['users'][i].key == req.params.user_id){
+                    found = true
+                    res.status(200).send(data['users'][i])
+                }
+            }
+            if(!found){
+                res.status(404).send("User does not exist")
+            }
+        });
+      
+    }
+}
+
+module.exports = {register_endpoints, create_user, get_user_details};
