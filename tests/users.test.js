@@ -1,8 +1,21 @@
-const conc = require('../endpoints/users').create_user
+const conc = require('../endpoints/users').create_user;
+const fs = require('fs');
+const DB = require('../DinoBase');
+const fetch = require('node-fetch');
+const server = require('../index').server;
+
+beforeAll(() => {
+  process.env.TESTING = true;
+});
+
+afterAll(() => {
+  fs.writeFileSync(DB.DB_TEST_PATH, '{}');
+  server.close();
+});
 
 test('create_user invalid parameters', () => {
-    let fetch = require('node-fetch');
-    fetch('http://localhost:3000/users', {
+    expect.assertions(1);
+    return fetch('http://localhost:3000/users', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: '{"name": "francesco"}'
@@ -15,8 +28,8 @@ test('create_user invalid parameters', () => {
 });
 
 test('create_user valid parameters', () => {
-    let fetch = require('node-fetch');
-    fetch('http://localhost:3000/users', {
+    expect.assertions(1);
+    return fetch('http://localhost:3000/users', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: '{"name": "testname", "surname": "testsurname", "email": "mail@test.test", "password": "testpwd"}'

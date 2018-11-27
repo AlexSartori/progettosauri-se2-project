@@ -1,10 +1,6 @@
 const DB = require('../DinoBase');
-var bodyParser = require('body-parser');
 
-function register_endpoint(app) {
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: false }));
-
+function register_endpoints(app) {
     app.post('/users', create_user);
 }
 
@@ -47,4 +43,4 @@ function create_user(req, res) {
     }
 }
 
-module.exports = {register_endpoint, create_user};
+module.exports = {register_endpoints, create_user};
