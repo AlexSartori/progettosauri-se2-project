@@ -4,6 +4,7 @@ const fs = require('fs');
 
 // Clear test DB before and after
 beforeAll(() => {
+    process.env.TESTING = true;
     fs.writeFileSync(DB.DB_TEST_PATH, "{}");
 });
 
@@ -19,7 +20,7 @@ test("Database Write", () => {
             'what': 'An object',
             'why': ['for', 'testing']
         }
-    }, true);
+    });
 
     // Check what was written
     data = JSON.parse(fs.readFileSync(DB.DB_TEST_PATH, 'utf8'));
@@ -38,7 +39,7 @@ test("Database Read", () => {
     read = {};
     DB.edit_data((data) => {
         read = data;
-    }, true);
+    });
 
     expect(read).toEqual({
         'prova': {
