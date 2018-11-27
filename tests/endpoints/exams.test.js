@@ -52,7 +52,7 @@ test("Successfully create Exam", () => {
     });
 });
 
-test("Fail create Exam with [400 Bad Parameters]", () => {
+test("Create invalid exam", () => {
     test_exam = {
         wrong: 'parameter'
     };
@@ -69,6 +69,7 @@ test("Fail create Exam with [400 Bad Parameters]", () => {
 });
 
 test("Get existing Exam", () => {
+    let EXAM_ID = 0;
     test_exam = {
         name: 'Exam #1',
         taskGroup: 121,
@@ -81,21 +82,32 @@ test("Get existing Exam", () => {
     };
 
     fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify({
-            key: 0,
+        exams: [{
+            key: EXAM_ID,
             value: test_exam
+        }]
     }));
 
-    expect.assertions(1);
-    return fetch(BASE_URL + "exams")
+    expect.assertions(2);
+    return fetch(BASE_URL + "exams/" + EXAM_ID)
     .then(res => {
         expect(res.status).toEqual(200);
         return res.text();
     }).then(res => {
-        test_exam.id = 0;
+        test_exam.id = EXAM_ID;
         expect(JSON.parse(res)).toEqual(test_exam);
     });
 });
 
+test("Get non-existing Exam", () => {
+    expect.assertions(1);
+
+    return fetch(BASE_URL + "exams/12345")
+    .then(res => {
+        expect(res.status).toEqual(404);
+        return res.text();
+    });
+});
 
 afterAll(() => {
   fs.writeFileSync(DB.DB_TEST_PATH, '{}');
