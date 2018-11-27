@@ -76,14 +76,13 @@ test("Successfully modify Exam", () => {
         }]
     }));
 
-    test_exam.id = EXAM_ID;
     // Modify exam
     test_exam.name = "New Name";
     test_exam.class = 18;
     test_exam.TA.push(113);
 
     expect.assertions(2);
-    return fetch(BASE_URL + "exams", {
+    return fetch(BASE_URL + "exams/" + EXAM_ID, {
         method: 'put',
         body: JSON.stringify(test_exam),
         headers: { 'Content-Type': 'application/json' }
