@@ -3,8 +3,8 @@ const DB_PATH = "db.json";
 const DB_TEST_PATH = "db.test.json";
 
 
-function edit_data(fun, testing) {
-    path = testing ? DB_TEST_PATH : DB_PATH;
+function edit_data(fun) {
+    path = process.env.TESTING ? DB_TEST_PATH : DB_PATH;
 
     data = JSON.parse(fs.readFileSync(path, 'utf8'));
     fun(data);
