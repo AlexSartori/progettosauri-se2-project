@@ -177,14 +177,6 @@ test('successful_get_classes_empty', () => {
 
 // GET /classes/:class_id
 
-/*test('register_endpoints_get', () => {
-  expect.assertions(1);
-  return fetch(BASE_URL, {method: 'GET'})
-  .then(res => {
-    expect(res.status).toEqual(400);
-  });
-});*/
-
 test('successful get class', () => {
   expect.assertions(2);
   return fetch(BASE_URL + '/0', {
@@ -196,7 +188,7 @@ test('successful get class', () => {
     return res.text();
   })
   .then(res => {
-    expect(JSON.parse(res)).toEqual([{name:'Test class',creator:0,users:[1],id:0}]);
+    expect(JSON.parse(res)).toEqual({name:'Test class',creator:0,users:[1],id:0});
   });
 });
 
@@ -211,7 +203,7 @@ test('fail get class non exist', () => {
     return res.text();
   })
   .then(res => {
-    expect(res).toBe(undefined);
+    expect(res).toBe("");
   })
 });
 
