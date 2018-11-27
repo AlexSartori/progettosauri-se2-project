@@ -3,6 +3,7 @@ const DB = require('../DinoBase');
 function register_endpoints(app) {
     app.post('/exams', create_exam);
     app.get('/exams/:exam_id', get_exam);
+    app.delete('/exams/:exam_id', delete_exam);
 }
 
 function get_exam(req, res) {
@@ -21,6 +22,27 @@ function get_exam(req, res) {
         let exam = found.value;
         exam.id = found.key;
         res.status(200).send(JSON.stringify(exam));
+    } else {
+        res.status(404).send("No such exam");
+    }
+}
+
+function delete_exam(req, res) {
+    let found = false;
+
+    DB.edit_data((data) => {
+        if (data['exams']) {
+            for (let i = 0; i < data['exams'].length; i++) {
+                if (data['exams'][i].key == req.params.exam_id) {
+                    found = true;
+                    data['exams'].splice(i, 1);
+                }
+            }
+        }
+    });
+
+    if (found) {
+        res.status(200).send();
     } else {
         res.status(404).send("No such exam");
     }
