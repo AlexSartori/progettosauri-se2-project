@@ -4,6 +4,7 @@ function register_endpoints(app) {
   app.post('/classes', create_class);
   app.get('/classes', get_classes);
   app.delete('/classes/:class_id', delete_class);
+  app.get('/classes/:class_id', get_info_class);
 }
 
 function create_class(req, res) {
@@ -77,8 +78,6 @@ function get_classes(req, res) {
   res.send(response);
 }
 
-module.exports = {register_endpoints, create_class, get_classes};
-
 function delete_class(req, res) {
   let class_id = req.params.class_id;
   let user = parseInt(req.get('user'));
@@ -107,6 +106,37 @@ function delete_class(req, res) {
 
   res.status(status);
   res.send('');
+}
+
+function get_info_class(req, res){
+  let class_id = req.params.class_id;
+  let user = parseInt(req.get('user'));
+  let status;
+  let result;
+
+  if (user != NaN){
+
+    DB.edit_data(data => {
+
+      if (data.users[user] != undefined) {
+
+        if (data.classes[class_id] != undefined) {
+
+          if(data.classes[class_id].creator == user){
+            status = 200;
+            result = data.classes[class_id];
+          } else
+            status = 403;
+        } else
+          status = 404;
+      } else
+        status = 400;
+    });
+  }else
+    status = 400;
+
+  res.status(status);
+  res.send(result);
 }
 
 module.exports = {register_endpoints, create_class, delete_class};

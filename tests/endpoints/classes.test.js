@@ -175,6 +175,90 @@ test('successful_get_classes_empty', () => {
   })
 });
 
+// GET /classes/:class_id
+
+/*test('register_endpoints_get', () => {
+  expect.assertions(1);
+  return fetch(BASE_URL, {method: 'GET'})
+  .then(res => {
+    expect(res.status).toEqual(400);
+  });
+});*/
+
+test('successful get class', () => {
+  expect.assertions(2);
+  return fetch(BASE_URL + '/0', {
+    method: 'GET',
+    headers: {'user': 0}
+  })
+  .then(res => {
+    expect(res.status).toEqual(200);
+    return res.text();
+  })
+  .then(res => {
+    expect(JSON.parse(res)).toEqual([{name:'Test class',creator:0,users:[1],id:0}]);
+  });
+});
+
+test('fail get class non exist', () => {
+  expect.assertions(2);
+  return fetch(BASE_URL + '/5', {
+    method: 'GET',
+    headers: {'user': 0}
+  })
+  .then(res => {
+    expect(res.status).toEqual(404);
+    return res.text();
+  })
+  .then(res => {
+    expect(res).toBe(undefined);
+  })
+});
+
+test('fail get class user not specified', () => {
+  expect.assertions(1);
+  return fetch(BASE_URL + '/0', {
+    method: 'GET'
+  })
+  .then(res => {
+    expect(res.status).toBe(400);
+  });
+});
+
+test('fail get class user not existing', () => {
+  expect.assertions(2);
+  return fetch(BASE_URL + '/0', {
+    method: 'GET',
+    headers: {
+      'user': 100
+    }
+  })
+  .then(res => {
+    expect(res.status).toBe(400);
+       DB.edit_data(data => {
+         expect(data.users[100]).toBe(undefined);
+      });
+  });
+});
+
+test('fail get class user no permission', () => {
+  expect.assertions(2);
+  return fetch(BASE_URL + '/0', {
+    method: 'DELETE',
+    headers: {
+      'user': 2
+    }
+  })
+  .then(res => {
+    expect(res.status).toBe(403);
+      DB.edit_data(data => {
+       expect(data.classes[0].creator).toBe(0);
+     });
+  });
+});
+
+
+// DELETE classes/:class_id
 test('failing delete class user not specified', () => {
   expect.assertions(1);
   return fetch(BASE_URL + '/0', {
