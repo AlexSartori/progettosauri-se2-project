@@ -9,19 +9,7 @@ const BASE_URL = `http://localhost:${PORT}/`;
 
 beforeAll(() => {
   process.env.TESTING = true;
-  fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify({
-      key: 0,
-      value: {
-          name: 'Exam #1',
-          taskGroup: 121,
-          mode: 'crowd sourcing',
-          class: 18,
-          TA: [12],
-          deadline: '2019-01-15 23:59',
-          duration: 120,
-          start: '2019-01-15 00:00'
-      }
-  }));
+  fs.writeFileSync(DB.DB_TEST_PATH, '{}');
 });
 
 test("Successfully create Exam", () => {
@@ -96,6 +84,8 @@ test("Get existing Exam", () => {
     }).then(res => {
         test_exam.id = EXAM_ID;
         expect(JSON.parse(res)).toEqual(test_exam);
+    }).then(() => {
+        fs.writeFileSync(DB.DB_TEST_PATH, '{}');
     });
 });
 
@@ -103,6 +93,43 @@ test("Get non-existing Exam", () => {
     expect.assertions(1);
 
     return fetch(BASE_URL + "exams/12345")
+    .then(res => {
+        expect(res.status).toEqual(404);
+        return res.text();
+    });
+});
+
+test("Delete existing Exam", () => {
+    let EXAM_ID = 0;
+
+    fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify({
+        exams: [{
+            key: EXAM_ID,
+            value: {
+                name: 'Exam #1',
+                taskGroup: 121,
+                mode: 'crowd sourcing',
+                class: 18,
+                TA: [12],
+                deadline: '2019-01-15 23:59',
+                duration: 120,
+                start: '2019-01-15 00:00'
+            }
+        }]
+    }));
+
+    expect.assertions(1);
+    return fetch(BASE_URL + "exams/" + EXAM_ID, {method: 'delete'})
+    .then(res => {
+        expect(res.status).toEqual(200);
+        return res.text();
+    });
+});
+
+test("Delete non-existing Exam", () => {
+    expect.assertions(1);
+
+    return fetch(BASE_URL + "exams/12345", {method: 'delete'})
     .then(res => {
         expect(res.status).toEqual(404);
         return res.text();
