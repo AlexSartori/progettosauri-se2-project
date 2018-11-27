@@ -37,7 +37,9 @@ afterAll(() => {
   server.close();
 });
 
-test('register_endpoints', () => {
+
+// POST /classes
+test('register_endpoints_post', () => {
   expect.assertions(1);
   return fetch(BASE_URL, {method: 'POST'})
   .then(res => {
@@ -124,5 +126,14 @@ test('failing_create_class_no_name_string', () => {
   })
   .then(res => {
     expect(res.status).toEqual(400);
+  });
+});
+
+// GET /classes
+test('register_endpoints_get', () => {
+  expect.assertions(1);
+  return fetch(BASE_URL, {method: 'GET'})
+  .then(res => {
+    expect(res.status).toEqual(200);
   });
 });

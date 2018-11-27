@@ -2,6 +2,7 @@ const DB = require('../DinoBase');
 
 function register_endpoints(app) {
   app.post('/classes', create_class);
+  app.get('/classes', get_classes);
 }
 
 function create_class(req, res) {
@@ -48,4 +49,9 @@ function create_class(req, res) {
   res.send();
 }
 
-module.exports = {register_endpoints, create_class};
+function get_classes(req, res) {
+  res.status(200);
+  res.send('');
+}
+
+module.exports = {register_endpoints, create_class, get_classes};
