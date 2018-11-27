@@ -173,6 +173,7 @@ test('successful_get_classes_empty', () => {
   .then(res => {
     expect(JSON.parse(res)).toEqual([]);
   })
+});
 
 test('failing delete class user not specified', () => {
   expect.assertions(1);
