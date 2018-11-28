@@ -12,7 +12,7 @@ beforeAll(() => {
   fs.writeFileSync(DB.DB_TEST_PATH, '{}');
 });
 
-test("Successfully create Exam", () => {
+test("Create valid Exam", () => {
     test_exam = {
         name: 'Test Exam',
         taskGroup: 0,
@@ -56,7 +56,7 @@ test("Create invalid exam", () => {
     });
 });
 
-test("Successfully modify Exam", () => {
+test("Modify valid Exam", () => {
     let EXAM_ID = 0;
     let test_exam = {
         name: 'Test Exam',
@@ -93,6 +93,42 @@ test("Successfully modify Exam", () => {
         DB.edit_data((data) => {
             expect(data['exams'][0].value).toEqual(test_exam);
         })
+    });
+});
+
+test("Modify invalid Exam", () => {
+    let EXAM_ID = 0;
+    let test_exam = {
+        name: 'Test Exam',
+        taskGroup: 0,
+        mode: 'exam',
+        class: 5,
+        TA: [2, 12, 6],
+        deadline: '2018-12-21 20:00',
+        duration: 120,
+        start: '2018-12-15 08:00'
+    };
+
+    fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify({
+        exams: [{
+            key: EXAM_ID,
+            value: test_exam
+        }]
+    }));
+
+    // Modify exam
+    test_exam.name = "New Name";
+    test_exam.class = "Should be int";
+    test_exam.deadline = "Totally not a date string";
+
+    expect.assertions(1);
+    return fetch(BASE_URL + "exams/" + EXAM_ID, {
+        method: 'put',
+        body: JSON.stringify(test_exam),
+        headers: { 'Content-Type': 'application/json' }
+    }).then(res => {
+        expect(res.status).toEqual(400);
+        return res.text();
     });
 });
 
