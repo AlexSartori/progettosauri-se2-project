@@ -1,9 +1,9 @@
-const conc = require('../endpoints/users').create_user;
+const conc = require('../../endpoints/users').create_user;
 const fs = require('fs');
-const DB = require('../DinoBase');
+const DB = require('../../DinoBase');
 const fetch = require('node-fetch');
-const server = require('../index').server;
-const PORT = require('../index').PORT;
+const server = require('../../index').server;
+const PORT = require('../../index').PORT;
 const BASE_URL = `http://localhost:${PORT}/`;
 
 beforeAll(() => {
@@ -52,13 +52,13 @@ test('Get user test, valid ID, users exist', () => {
              "password":"dinopwd",
              "name":"dinoname",
              "surname":"dinosurname"}}]
-    }    
+    }
 
     fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify(user))
     expect.assertions(2);
     ID = 0
-    return fetch(BASE_URL + 'users/'+ ID, 
-        {method: 'GET', 
+    return fetch(BASE_URL + 'users/'+ ID,
+        {method: 'GET',
         headers:{'Content-Type': 'application/json'}
     }).then(res => {
         expect(res.status).toEqual(200);
@@ -74,43 +74,43 @@ test('Get user test, valid ID, users exist', () => {
 test('Get user test, unvalid ID, not an integer', () => {
     expect.assertions(2);
     ID= 'string'
-    return fetch(BASE_URL + 'users/'+ ID, 
-        {method: 'GET',  
+    return fetch(BASE_URL + 'users/'+ ID,
+        {method: 'GET',
          headers:{'Content-Type': 'application/json'}
     }).then(res => {
         expect(res.status).toEqual(400);
         return res.text();
-    }).then(text => 
+    }).then(text =>
         expect(text).toEqual('Bad parameter, user_id should be a positive integer'));
  });
-    
-// - ID is not a positive integer  
+
+// - ID is not a positive integer
 test('Get user test, unvalid ID, negative integer ', () => {
     expect.assertions(2);
-    ID= '-1' 
-    return fetch(BASE_URL + 'users/'+ ID, 
-        {method: 'GET', 
+    ID= '-1'
+    return fetch(BASE_URL + 'users/'+ ID,
+        {method: 'GET',
         headers:{'Content-Type': 'application/json'}
     }).then(res => {
         expect(res.status).toEqual(400);
         return res.text();
-    }).then(text => 
+    }).then(text =>
         expect(text).toEqual('Bad parameter, user_id should be a positive integer'));
 });
-/*    
+/*
 // - ID is not in db
 test('Get user test, unvalid ID, not found', () => {
    DB.edit_data((data) => {
         ID = (Object.keys(data['users']).sort().length+1).toString()
     });
-    
+
     ID = 40
     expect.assertions(2);
     return fetch(BASE_URL + 'users/'+ ID
-    ).then(res => { 
+    ).then(res => {
         expect(res.status).toEqual(404);
         return res.text();
-    }).then(text => 
+    }).then(text =>
         expect(text).toEqual('User does not exist'));
 });*/
 
@@ -123,11 +123,11 @@ test('Delete user, valid test', () => {
              "password":"dinopwd",
              "name":"dinoname",
              "surname":"dinosurname"}}]
-  }    
+  }
     fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify(user))
     expect.assertions(2);
     ID = 1
-    return fetch(BASE_URL + 'users/'+ ID, { 
+    return fetch(BASE_URL + 'users/'+ ID, {
         method: 'DELETE',
         headers:{'Content-Type': 'application/json',
                  'user' : ID}
@@ -137,7 +137,7 @@ test('Delete user, valid test', () => {
     }).then(text => {
         fs.writeFileSync(DB.DB_TEST_PATH, {})
         expect(text).toEqual("Success, account has been deleted")})
-        
+
 });
 
 //UNVALID TESTS:
@@ -153,7 +153,7 @@ test('Delete user test, user_id is different from user in header', () => {
     }).then(res => {
         expect(res.status).toEqual(403);
         return res.text();
-    }).then(text => 
+    }).then(text =>
         expect(text).toEqual("Permission denied, you are trying to delete an other user's account"));
  });
 
@@ -168,15 +168,15 @@ test('Delete user test, unvalid user_id, not an integer', () => {
     }).then(res => {
         expect(res.status).toEqual(400);
         return res.text();
-    }).then(text => 
+    }).then(text =>
         expect(text).toEqual('Bad parameter, user_id should be a positive integer'));
  });
-       
 
-// - ID is not a positive integer  
+
+// - ID is not a positive integer
 test('Delete user test, unvalid user_id, negative integer ', () => {
     expect.assertions(2);
-    ID= '-1' 
+    ID= '-1'
     return fetch(BASE_URL + 'users/'+ ID, {
         method: 'DELETE',
         headers:{'Content-Type': 'application/json',
@@ -184,7 +184,7 @@ test('Delete user test, unvalid user_id, negative integer ', () => {
     }).then(res => {
         expect(res.status).toEqual(400);
         return res.text();
-    }).then(text => 
+    }).then(text =>
         expect(text).toEqual('Bad parameter, user_id should be a positive integer'));
 });
 
@@ -199,10 +199,10 @@ test('Delete user test, user_ID not in db', () => {
         method: 'DELETE',
         headers: {'Content-Type': 'application/json',
                   'user' : parseInt(ID)}
-    }).then(res => { 
+    }).then(res => {
         expect(res.status).toEqual(404);
         return res.text();
-    }).then(text => 
+    }).then(text =>
         expect(text).toEqual('User does not exist'));
 });
 */
