@@ -62,7 +62,7 @@ function get_user_details(req, res){
         DB.edit_data((data) => {
         //check if the user exists
            found = false
-           if(!data['users']){
+           if(typeof data['users'] == 'undefined'){
             res.status(404).send("User does not exist")
            } else {
                 for(i in data['users']){
@@ -103,7 +103,7 @@ function delete_user(req, res){
             DB.edit_data((data) => {
                 //check if the user exists
                 found = false
-                if(!data['users']){
+                if(typeof data['users'] == 'undefined'){
                   res.status(404).send("User does not exist")
                 } else {
                     for(i in data['users']){
