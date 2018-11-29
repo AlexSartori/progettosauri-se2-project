@@ -22,7 +22,7 @@ test('create_user invalid parameters', () => {
     return fetch(BASE_URL + USER_URL, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body:'{"name": "francesco"'
+        body:'{"name": "francesco"}'
     }).then(response => {
         expect(response.status).toEqual(400);
         return response.status;
