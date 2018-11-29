@@ -48,7 +48,7 @@ test('create_user valid parameters', () => {
 //get_user_details test:
 //VALID TEST
 test('Get user test, valid ID, users exist', () => {
-    create_valid_user(0)
+    create_valid_user(0);
     expect.assertions(2);
     ID = 0
     return fetch(BASE_URL + USER_URL+ ID

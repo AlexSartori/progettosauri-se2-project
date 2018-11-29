@@ -60,9 +60,11 @@ function get_user_details(req, res){
         res.status(400).send("Bad parameter, user_id should be a positive integer")
     } else {
         DB.edit_data((data) => {
-            //check if the user exists
-            found = false
-           if(data['users']){
+        //check if the user exists
+           found = false
+           if(!data['users']){
+            res.status(404).send("User does not exist")
+           } else {
                 for(i in data['users']){
                     if (data['users'][i].key == req.params.user_id){
                         found = true
@@ -70,9 +72,11 @@ function get_user_details(req, res){
                     }
                 }
             }
+            
             if(!found){
                 res.status(404).send("User does not exist")
             }
+            
         });
       
     }
@@ -99,11 +103,15 @@ function delete_user(req, res){
             DB.edit_data((data) => {
                 //check if the user exists
                 found = false
-                for(i in data['users']){
-                    if (data['users'][i].key == req.params.user_id){
-                        found = true
-                        data['users'].splice(i,1)
-                        res.status(200).send("Success, account has been deleted")
+                if(!data['users']){
+                  res.status(404).send("User does not exist")
+                } else {
+                    for(i in data['users']){
+                        if (data['users'][i].key == req.params.user_id){
+                            found = true
+                            data['users'].splice(i,1)
+                            res.status(200).send("Success, account has been deleted")
+                        }
                     }
                 }
                 if(!found){
