@@ -86,7 +86,7 @@ test('Get user test, unvalid ID, negative integer ', () => {
         expect(text).toEqual('Bad parameter, user_id should be a positive integer'));
 });
 
-// - user_id is not in db
+/*// - user_id is not in db
 test('Get user test, unvalid ID, not found', () => {
     clean_db()
     ID = 0
@@ -97,7 +97,7 @@ test('Get user test, unvalid ID, not found', () => {
         return res.text();
     }).then(text =>
         expect(text).toEqual('User does not exist'));
-});
+});*/
 
 // Delete_user tests:
 // VALID TEST: 
@@ -169,7 +169,7 @@ test('Delete user test, unvalid user_id, negative integer ', () => {
         expect(text).toEqual('Bad parameter, user_id should be a positive integer'));
 });
 
-// - user_id is not in db (user_id should be equal to user in headers)
+/*// - user_id is not in db (user_id should be equal to user in headers)
 test('Delete user test, user_ID not in db', () => {
     clean_db();
     expect.assertions(2);
@@ -183,5 +183,5 @@ test('Delete user test, user_ID not in db', () => {
         return res.text();
     }).then(text =>
         expect(text).toEqual('User does not exist'));
-});
+});*/
 
