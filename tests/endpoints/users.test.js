@@ -185,3 +185,33 @@ test('Delete user test, user_ID not in db', () => {
         expect(text).toEqual('User does not exist'));
 });*/
 
+// edit_user_details tests:
+// VALID TESTS
+// - string type object in body (no other requirements), valid user_id in path, user exists, permission is valid 
+test("Edit user details, valid test", (req,res) => {
+    ID = 0
+    var user =create_valid_user(ID)
+    user.value.name = 'newname'
+    user.value.surname='newsurname'
+    expect.assertions(2);
+    return fetch(BASE_URL+USER_URL+ID, {
+            method: 'PUT',
+            headers: {'Content-Type':'application/json',
+                      'user' : ID},
+            body: JSON.stringify(user)
+    }).then( res => {
+        expect(res.status).toEqual(200);
+        return res.text();
+    }).then( text => {
+        expect(text).toEqual(()=>{
+            return fetch(BASE_URL + USER_URL+ ID)
+            }).then(res => {
+                expect(res.status).toEqual(200);
+                return res.json()
+            }).then(text => {
+                expect(text).toEqual(data['users'][ID])
+                clean_db()
+            })
+
+    })
+})

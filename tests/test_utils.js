@@ -10,7 +10,7 @@ function create_valid_user(x){
              "surname":"dinosurname"}}]
     }
     fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify(user))
-    return user
+    return user.users[x]
 }
 
 function create_unvalid_user(x){

@@ -4,6 +4,7 @@ function register_endpoints(app) {
     app.post('/users', create_user);
     app.get('/users/:user_id', get_user_details);
     app.delete('/users/:user_id', delete_user);
+    app.put('/users/:user_id',edit_user_details)
 }
 
 function create_user(req, res) {
@@ -45,18 +46,25 @@ function create_user(req, res) {
     }
 }
 
+// Check path validity
+function check_path(id){
+  if (id < 0 || isNaN(parseInt(id, 10))) {
+    return false
+  } else {
+    return true}
+}
+  // Check body validity
+function check_body(param) {
+    Valid = true;
+    valid &= param.name != undefined && typeof(param.name) == 'string';
+    valid &= param.surname != undefined && typeof(param.name) == 'string';
+    valid &= param.email != undefined  && typeof(param.email) == 'string';
+    valid &= param.password != undefined && typeof(param.password) == 'string';
+    return valid
+}
+
 function get_user_details(req, res){
-
-    function check_parameter(id){
-        if (id < 0 || isNaN(parseInt(id, 10))) {
-            return false
-        } else {
-            return true}
-    }
-
-    var check = check_parameter(req.params.user_id)
-
-    if (!check){
+    if (!check_path(req.params.user_id)){
         res.status(400).send("Bad parameter, user_id should be a positive integer")
     } else {
         DB.edit_data((data) => {
@@ -83,17 +91,7 @@ function get_user_details(req, res){
 }
 
 function delete_user(req, res){ 
-    function check_parameter(id){
-        if (id < 0 || isNaN(parseInt(id, 10))) {
-            return false
-        } else {
-            return true}
-    }
-
-    var check = check_parameter(req.params.user_id)
-    //var checkH = check_header(req.get('user'))
-
-    if (!check){
+  if (!check_path(req.params.user_id)){
         res.status(400).send("Bad parameter, user_id should be a positive integer")
     } else {
         //check permissions
@@ -123,4 +121,31 @@ function delete_user(req, res){
     }
 }
 
-module.exports = {register_endpoints, create_user, get_user_details, delete_user };
+
+
+function edit_user_details(req, res) {
+  if (!check_body(req.body) || !check_path(req.params.user_id)) {
+    res.status(400).send("Bad parameter");
+  } else {
+      //check permissions
+      if (req.get('user') !== req.params.user_id){
+        res.status(403).send("Permission denied, you are trying to delete an other user's account")
+      } else { 
+        let found = false;
+        DB.edit_data((data) => {
+            if(data['users']) {
+                for (i in data['users'])
+                    if (data['users'][i].key == req.params.user_id){
+                        data['users'][i].value = req.body;
+                        res.status(200).send(data['users'][i])
+                        found = true
+                    }
+                }
+        });
+        if (!found){
+            res.status(404).send("User does not exist");
+        }
+    }
+}
+}
+module.exports = {register_endpoints, create_user, get_user_details, delete_user, edit_user_details};
