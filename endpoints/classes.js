@@ -5,6 +5,7 @@ function register_endpoints(app) {
   app.get('/classes', get_classes);
   app.delete('/classes/:class_id', delete_class);
   app.get('/classes/:class_id', get_info_class);
+  app.put('/classes/:class_id', modify_class);
 }
 
 function create_class(req, res) {
@@ -125,6 +126,56 @@ function get_info_class(req, res){
           if(data.classes[class_id].creator == user){
             status = 200;
             result = data.classes[class_id];
+          } else
+            status = 403;
+        } else
+          status = 404;
+      } else
+        status = 400;
+    });
+  }else
+    status = 400;
+
+  res.status(status);
+  res.send(result);
+}
+
+function modify_class(req, res){
+
+  let class_id = req.params.class_id;
+  let user = parseInt(req.get('user'));
+
+  // Checks if the name is provided and is a string
+  let valid = req.body.name != undefined;
+  valid &= typeof(req.body.name) == 'string';
+  valid &= Array.isArray(req.body.users);
+  valid &= user != NaN;
+
+  let status;
+  let result;
+
+  if (valid){
+
+    DB.edit_data(data => {
+
+      if (data.users[user] != undefined) {
+
+        if (data.classes[class_id] != undefined) {
+
+          if(data.classes[class_id].creator == user){
+
+            data.classes[class_id].name = req.body.name;
+            data.classes[class_id].users = [];
+
+            // Checks which user ids are existing and adds them in the class
+            req.body.users.forEach(class_member => {
+              if (data.users[class_member] != undefined) {
+                data.classes[class_id].users.push(class_member);
+              }
+            });
+
+            result = data.classes[class_id];
+            status = 200;
           } else
             status = 403;
         } else
