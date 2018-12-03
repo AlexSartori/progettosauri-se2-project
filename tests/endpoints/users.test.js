@@ -8,7 +8,6 @@ const create_valid_user = require('../test_utils').create_valid_user
 const clean_db = require('../test_utils').clean_db
 
 beforeAll(() => {
-  process.env.TESTING = true;
   clean_db()
 });
 
@@ -100,7 +99,7 @@ test('Get user test, unvalid ID, not found', () => {
 });*/
 
 // Delete_user tests:
-// VALID TEST: 
+// VALID TEST:
 // - user_id exists and it's equal to user in headers
 test('Delete user, valid test', () => {
     create_valid_user(0);
@@ -184,4 +183,3 @@ test('Delete user test, user_ID not in db', () => {
     }).then(text =>
         expect(text).toEqual('User does not exist'));
 });*/
-

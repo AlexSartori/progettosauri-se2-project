@@ -1097,9 +1097,6 @@ definitions:
       name:
         type: string
         description: "Name of the user"
-      surname:
-        type: string
-        description: "Surname of the user"
 
   UserPost:
     type: object
@@ -1113,14 +1110,10 @@ definitions:
       name:
         type: string
         description: "Name of the user"
-      surname:
-        type: string
-        description: "Surname of the user"
     required:
       - email
       - password
       - name
-      - surname
 
   UserPut:
     type: object
@@ -1134,9 +1127,6 @@ definitions:
       name:
         type: string
         description: "Name of the user"
-      surname:
-        type: string
-        description: "Surname of the user"
 
   Task:
     type: object

@@ -10,8 +10,7 @@ const PORT = require('../../index').PORT;
 const BASE_URL = `http://localhost:${PORT}/classes`;
 
 beforeAll(() => {
-  process.env.TESTING = true;
-  fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify({
+  fs.writeFileSync(DB.DB_PATH, JSON.stringify({
     'classes': {},
     'classes_next_id': 0,
     'users': {
@@ -39,7 +38,7 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  fs.writeFileSync(DB.DB_TEST_PATH, '{}');
+  fs.writeFileSync(DB.DB_PATH, '{}');
   server.close();
 });
 

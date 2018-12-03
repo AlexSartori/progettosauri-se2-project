@@ -8,8 +8,7 @@ const BASE_URL = `http://localhost:${PORT}/`;
 
 
 beforeAll(() => {
-  process.env.TESTING = true;
-  fs.writeFileSync(DB.DB_TEST_PATH, '{}');
+  fs.writeFileSync(DB.DB_PATH, '{}');
 });
 
 test("Create valid Exam", () => {
@@ -69,7 +68,7 @@ test("Modify valid Exam", () => {
         start: '2018-12-15 08:00'
     };
 
-    fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify({
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({
         exams: [{
             key: EXAM_ID,
             value: test_exam
@@ -109,7 +108,7 @@ test("Modify invalid Exam", () => {
         start: '2018-12-15 08:00'
     };
 
-    fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify({
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({
         exams: [{
             key: EXAM_ID,
             value: test_exam
@@ -169,7 +168,7 @@ test("Get existing Exam", () => {
         start: '2019-01-15 00:00'
     };
 
-    fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify({
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({
         exams: [{
             key: EXAM_ID,
             value: test_exam
@@ -185,7 +184,7 @@ test("Get existing Exam", () => {
         test_exam.id = EXAM_ID;
         expect(JSON.parse(res)).toEqual(test_exam);
     }).then(() => {
-        fs.writeFileSync(DB.DB_TEST_PATH, '{}');
+        fs.writeFileSync(DB.DB_PATH, '{}');
     });
 });
 
@@ -202,7 +201,7 @@ test("Get non-existing Exam", () => {
 test("Delete existing Exam", () => {
     let EXAM_ID = 0;
 
-    fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify({
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({
         exams: [{
             key: EXAM_ID,
             value: {
@@ -237,6 +236,6 @@ test("Delete non-existing Exam", () => {
 });
 
 afterAll(() => {
-  fs.writeFileSync(DB.DB_TEST_PATH, '{}');
+  fs.writeFileSync(DB.DB_PATH, '{}');
   server.close();
 });

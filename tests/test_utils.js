@@ -9,7 +9,7 @@ function create_valid_user(x){
              "name":"dinoname",
              "surname":"dinosurname"}}]
     }
-    fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify(user))
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify(user))
     return user
 }
 
@@ -19,12 +19,12 @@ function create_unvalid_user(x){
              "value":{"email":"prova@dinomail.com"}}]
     }
 
-    fs.writeFileSync(DB.DB_TEST_PATH, JSON.stringify(user))
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify(user))
     return user
 }
 
 function clean_db(){
-    fs.writeFileSync(DB.DB_TEST_PATH, {})
+    fs.writeFileSync(DB.DB_PATH, {})
     return
 }
 
