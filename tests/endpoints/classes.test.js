@@ -236,7 +236,7 @@ test('fail get class user not existing', () => {
 test('fail get class user no permission', () => {
   expect.assertions(2);
   return fetch(BASE_URL + '/0', {
-    method: 'DELETE',
+    method: 'GET',
     headers: {
       'user': 2
     }
@@ -249,6 +249,133 @@ test('fail get class user no permission', () => {
   });
 });
 
+// PUT /classes/:class_id
+
+test('successful modify class', () => {
+  expect.assertions(2);
+  new_class = {
+    'name': 'New name class',
+    'users': [1,2]
+  };
+  return fetch(BASE_URL + '/0', {
+    method: 'PUT',
+    body: JSON.stringify(new_class),
+    headers: {
+      'Content-Type': 'application/json',
+      'user': 0
+    }
+  })
+  .then(res => {
+    expect(res.status).toEqual(200);
+    return res.text();
+  })
+  .then(res => {
+    expect(JSON.parse(res)).toEqual({name:'New name class',creator:0,users:[1,2],id:0});
+  });
+});
+
+test('fail modify class non exist', () => {
+  expect.assertions(2);
+  new_class = {
+    'name': 'New name class',
+    'users': [1]
+  };
+  return fetch(BASE_URL + '/5', {
+    method: 'PUT',
+    body: JSON.stringify(new_class),
+    headers: {
+      'Content-Type': 'application/json',
+      'user': 0
+    }
+  })
+  .then(res => {
+    expect(res.status).toEqual(404);
+    return res.text();
+  })
+  .then(res => {
+    expect(res).toBe("");
+  })
+});
+
+test('fail modify class user not specified', () => {
+  expect.assertions(1);
+  new_class = {
+    'name': 'New name class',
+    'users': [1]
+  };
+  return fetch(BASE_URL + '/0', {
+    method: 'PUT',
+    body: JSON.stringify(new_class),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(res => {
+    expect(res.status).toBe(400);
+  });
+});
+
+test('fail modify class name not specified', () => {
+  expect.assertions(1);
+  new_class = {
+    'users': [1]
+  };
+  return fetch(BASE_URL + '/0', {
+    method: 'PUT',
+    body: JSON.stringify(new_class),
+    headers: {
+      'Content-Type': 'application/json',
+      'user': 0
+    }
+  })
+  .then(res => {
+    expect(res.status).toBe(400);
+  });
+});
+
+test('fail modify class user not existing', () => {
+  expect.assertions(2);
+  new_class = {
+    'name': 'New name class',
+    'users': [1]
+  };
+  return fetch(BASE_URL + '/0', {
+    method: 'PUT',
+    body: JSON.stringify(new_class),
+    headers: {
+      'Content-Type': 'application/json',
+      'user': 100
+    }
+  })
+  .then(res => {
+    expect(res.status).toBe(400);
+       DB.edit_data(data => {
+         expect(data.users[100]).toBe(undefined);
+      });
+  });
+});
+
+test('fail modify class user no permission', () => {
+  expect.assertions(2);
+  new_class = {
+    'name': 'New name class',
+    'users': [1]
+  };
+  return fetch(BASE_URL + '/0', {
+    method: 'PUT',
+    body: JSON.stringify(new_class),
+    headers: {
+      'Content-Type': 'application/json',
+      'user': 2
+    }
+  })
+  .then(res => {
+    expect(res.status).toBe(403);
+      DB.edit_data(data => {
+       expect(data.classes[0].creator).toBe(0);
+     });
+  });
+});
 
 // DELETE classes/:class_id
 test('failing delete class user not specified', () => {
