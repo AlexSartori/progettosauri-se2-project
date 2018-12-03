@@ -2,6 +2,7 @@ const DB = require('../DinoBase');
 
 function register_endpoints(app) {
   app.post('/tasks', create_task);
+  app.delete('/tasks/:task_id', delete_task);
 }
 
 function create_task(req, res) {
@@ -18,7 +19,8 @@ function create_task(req, res) {
     new_task = {
       'text': req.body.text,
       'answers': {},
-      'answers_next_id': 0
+      'answers_next_id': 0,
+      'creator': user
     }
 
     DB.edit_data(data => {
@@ -68,4 +70,34 @@ function create_task(req, res) {
   res.send();
 }
 
-module.exports = {register_endpoints, create_task};
+function delete_task(req, res) {
+  let task_id = req.params.task_id;
+  let user = parseInt(req.get('user'));
+  let status;
+
+  if (user != NaN){
+
+    DB.edit_data(data => {
+
+      if (data.users[user] != undefined) {
+
+        if (data.tasks[task_id] != undefined) {
+
+          if(data.tasks[task_id].creator == user){
+            status = 200;
+            delete data.tasks[task_id];
+          } else
+          status = 403;
+        } else
+          status = 404;
+      } else
+        status = 400;
+    });
+  }else
+    status = 400;
+
+  res.status(status);
+  res.send('');
+}
+
+module.exports = {register_endpoints, create_task, delete_task};

@@ -592,6 +592,8 @@ paths:
       responses:
         200:
           description: Success
+        400:
+          description: Bad parameters
         403:
           description: Permission denied
         404:
