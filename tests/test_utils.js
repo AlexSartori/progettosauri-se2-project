@@ -24,8 +24,7 @@ function create_unvalid_user(x){
 }
 
 function clean_db(){
-    fs.writeFileSync(DB.DB_PATH, {})
-    return
+    fs.writeFileSync(DB.DB_PATH, '{}');
 }
 
 module.exports = {create_valid_user, clean_db, create_unvalid_user}

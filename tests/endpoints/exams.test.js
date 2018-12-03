@@ -2,16 +2,19 @@ const exams = require('../../endpoints/exams')
 const fetch = require('node-fetch');
 const fs = require('fs');
 const DB = require('../../DinoBase');
+const clean_db = require('../test_utils').clean_db;
 const server = require('../../index').server;
 const PORT = process.env.PORT || require('../../index').PORT;
 const BASE_URL = `http://localhost:${PORT}/`;
 
 
 beforeAll(() => {
-  fs.writeFileSync(DB.DB_PATH, '{}');
+    clean_db();
 });
 
 test("Create valid Exam", () => {
+    clean_db();
+
     test_exam = {
         name: 'Test Exam',
         taskGroup: 0,
@@ -33,8 +36,8 @@ test("Create valid Exam", () => {
         return res.text();
     }).then(() => {
         DB.edit_data((data) => {
-            test_exam.id = 1;
-            expect(data['exams'][0].value).toEqual(test_exam);
+            test_exam.id = 0;
+            expect(data.exams[0]).toEqual(test_exam);
         })
     });
 });
@@ -56,7 +59,6 @@ test("Create invalid exam", () => {
 });
 
 test("Modify valid Exam", () => {
-    let EXAM_ID = 0;
     let test_exam = {
         name: 'Test Exam',
         taskGroup: 0,
@@ -69,19 +71,19 @@ test("Modify valid Exam", () => {
     };
 
     fs.writeFileSync(DB.DB_PATH, JSON.stringify({
-        exams: [{
-            key: EXAM_ID,
-            value: test_exam
-        }]
+        exams: {
+            0: test_exam
+        }
     }));
 
     // Modify exam
     test_exam.name = "New Name";
     test_exam.class = 18;
     test_exam.TA.push(113);
+    test_exam.id = 0;
 
     expect.assertions(2);
-    return fetch(BASE_URL + "exams/" + EXAM_ID, {
+    return fetch(BASE_URL + "exams/0", {
         method: 'put',
         body: JSON.stringify(test_exam),
         headers: { 'Content-Type': 'application/json' }
@@ -90,7 +92,7 @@ test("Modify valid Exam", () => {
         return res.text();
     }).then(() => {
         DB.edit_data((data) => {
-            expect(data['exams'][0].value).toEqual(test_exam);
+            expect(data.exams[0]).toEqual(test_exam);
         })
     });
 });
@@ -109,10 +111,9 @@ test("Modify invalid Exam", () => {
     };
 
     fs.writeFileSync(DB.DB_PATH, JSON.stringify({
-        exams: [{
-            key: EXAM_ID,
-            value: test_exam
-        }]
+        exams: {
+            0: test_exam
+        }
     }));
 
     // Modify exam
@@ -156,8 +157,8 @@ test("Modify non-existing Exam", () => {
 });
 
 test("Get existing Exam", () => {
-    let EXAM_ID = 0;
     let test_exam = {
+        id: 0,
         name: 'Exam #1',
         taskGroup: 121,
         mode: 'crowd sourcing',
@@ -168,23 +169,17 @@ test("Get existing Exam", () => {
         start: '2019-01-15 00:00'
     };
 
-    fs.writeFileSync(DB.DB_PATH, JSON.stringify({
-        exams: [{
-            key: EXAM_ID,
-            value: test_exam
-        }]
-    }));
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({ exams: { 0: test_exam } }));
 
     expect.assertions(2);
-    return fetch(BASE_URL + "exams/" + EXAM_ID)
+    return fetch(BASE_URL + "exams/0")
     .then(res => {
         expect(res.status).toEqual(200);
         return res.text();
     }).then(res => {
-        test_exam.id = EXAM_ID;
         expect(JSON.parse(res)).toEqual(test_exam);
     }).then(() => {
-        fs.writeFileSync(DB.DB_PATH, '{}');
+        clean_db();
     });
 });
 
@@ -202,9 +197,9 @@ test("Delete existing Exam", () => {
     let EXAM_ID = 0;
 
     fs.writeFileSync(DB.DB_PATH, JSON.stringify({
-        exams: [{
-            key: EXAM_ID,
-            value: {
+        exams: {
+            0: {
+                id: 0,
                 name: 'Exam #1',
                 taskGroup: 121,
                 mode: 'crowd sourcing',
@@ -214,7 +209,7 @@ test("Delete existing Exam", () => {
                 duration: 120,
                 start: '2019-01-15 00:00'
             }
-        }]
+        }
     }));
 
     expect.assertions(1);
@@ -222,7 +217,9 @@ test("Delete existing Exam", () => {
     .then(res => {
         expect(res.status).toEqual(200);
         return res.text();
-    });
+    }).then(() =>
+        clean_db()
+    );
 });
 
 test("Delete non-existing Exam", () => {
@@ -236,6 +233,6 @@ test("Delete non-existing Exam", () => {
 });
 
 afterAll(() => {
-  fs.writeFileSync(DB.DB_PATH, '{}');
-  server.close();
+    clean_db();
+    server.close();
 });
