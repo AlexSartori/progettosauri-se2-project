@@ -4,6 +4,7 @@ const PORT = require('../../index').PORT;
 const BASE_URL = `http://localhost:${PORT}/`;
 const USER_URL = 'users/'
 const create_valid_user = require('../test_utils').create_valid_user
+const create_multiple_users = require('../test_utils').create_multiple_users
 const clean_db = require('../test_utils').clean_db
 
 beforeAll(() => {
@@ -12,7 +13,7 @@ beforeAll(() => {
 
 afterAll(() => {
   clean_db();
-  //server.close();
+  server.close();
 });
 
 test('create_user invalid parameters', () => {
@@ -77,12 +78,12 @@ test('Get user test, valid ID, users exist', () => {
         clean_db()
     })
 });
-/*
+
 // UNVALID TESTS:
 // - user_id is not an integer
 test('Get user test, unvalid ID, not an integer', () => {
     expect.assertions(2);
-    ID= 'string'
+    ID = 'string'
     return fetch(BASE_URL + USER_URL+ ID
     ).then(res => {
         expect(res.status).toEqual(400);
@@ -94,7 +95,7 @@ test('Get user test, unvalid ID, not an integer', () => {
 // - user_id is not a positive integer
 test('Get user test, unvalid ID, negative integer ', () => {
     expect.assertions(2);
-    ID= '-1'
+    ID = '-1'
     return fetch(BASE_URL + USER_URL+ ID,
     ).then(res => {
         expect(res.status).toEqual(400);
@@ -120,7 +121,7 @@ test('Get user test, unvalid ID, not found', () => {
 // VALID TEST:
 // - user_id exists and it's equal to user in headers
 test('Delete user, valid test', () => {
-    create_valid_user(0);
+    create_valid_user();
     expect.assertions(2);
     ID = 0
     return fetch(BASE_URL + USER_URL+ ID, {
@@ -139,8 +140,7 @@ test('Delete user, valid test', () => {
 // - user_id != header user (both users have to exist)
 test('Delete user test, user_id is different from user in header', () => {
     clean_db();
-    create_valid_user(0);
-    create_valid_user(1);
+    create_multiple_users();
     expect.assertions(2);
     ID = 0
     return fetch(BASE_URL + USER_URL+ ID, {
@@ -201,7 +201,7 @@ test('Delete user test, user_ID not in db', () => {
     }).then(text =>
         expect(text).toEqual('User does not exist'));
 });
-
+/*
 // edit_user_details tests:
 // VALID TESTS
 // - string type object in body (no other requirements), valid user_id in path, user exists, permission is valid
