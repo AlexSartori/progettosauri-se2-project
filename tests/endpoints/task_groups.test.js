@@ -87,6 +87,37 @@ test("Get specfic non-existing Task Group", () => {
     });
 });
 
+test("Get all Task Groups", () => {
+    clean_db();
+
+    test_tg_1 = {
+        id: 0,
+        name: "TG #1",
+        tasks: [1, 2, 3, 4]
+    },
+    test_tg_2 = {
+        id: 2,
+        name: "TG #2",
+        tasks: [712, 121, 456]
+    };
+
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({
+        task_groups: {
+            0: test_tg_1,
+            1: test_tg_2
+        }
+    }));
+
+    expect.assertions(2);
+    return fetch(BASE_URL + "task_groups")
+    .then(res => {
+        expect(res.status).toEqual(200);
+        return res.text();
+    }).then(res => {
+        expect(JSON.parse(res)).toEqual([test_tg_1, test_tg_2]);
+    });
+});
+
 afterAll(() => {
     clean_db();
     server.close();

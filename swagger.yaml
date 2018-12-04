@@ -747,10 +747,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/definitions/TaskGroup"
-        400:
-          description: Bad parameters
-        404:
-          description: Resource not found
 
     # Create a Task Group
     post:
