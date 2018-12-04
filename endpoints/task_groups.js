@@ -1,9 +1,20 @@
 const DB = require('../DinoBase');
 
 function register_endpoints(app) {
-    // app.get('/task_groups', get_all_tgs);
+    app.get('/task_groups', get_all_tgs);
     app.get('/task_groups/:tg_id', get_tg);
     app.post('/task_groups', create_tg);
+}
+
+function get_all_tgs(req, res) {
+    let result = [];
+
+    DB.edit_data((data) => {
+        if (data.task_groups)
+            Object.keys(data.task_groups).forEach((k) => result.push(data.task_groups[k]));
+    });
+
+    res.status(200).send(result);
 }
 
 function get_tg(req, res) {
