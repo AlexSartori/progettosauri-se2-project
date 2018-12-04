@@ -4,6 +4,7 @@ function register_endpoints(app) {
   app.post('/tasks', create_task);
   app.get('/tasks', get_available_tasks);
   app.delete('/tasks/:task_id', delete_task);
+  app.get('/tasks/:task_id', get_task);
 }
 
 function create_task(req, res) {
@@ -127,4 +128,34 @@ function get_available_tasks(req, res) {
   }
 }
 
-module.exports = {register_endpoints, create_task, delete_task, get_available_tasks};
+function get_task(req, res) {
+  let task_id = req.params.task_id;
+  let user = parseInt(req.get('user'));
+  let status;
+  let content = '';
+
+  if (user != NaN){
+
+    DB.read_data(data => {
+
+      if (data.users[user] != undefined) {
+
+        if (data.tasks[task_id] != undefined) {
+          if(data.tasks[task_id].creator == user){
+            status = 200;
+            content = data.tasks[task_id];
+          } else
+          status = 403;
+        } else
+          status = 404;
+      } else
+        status = 400;
+    });
+  }else
+    status = 400;
+
+  res.status(status);
+  res.send(content);
+}
+
+module.exports = {register_endpoints, create_task, delete_task, get_available_tasks, get_task};
