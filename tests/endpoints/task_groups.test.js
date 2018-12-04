@@ -29,7 +29,7 @@ test("Create valid Task Group", () => {
     }).then((res) => {
         expect(res).toEqual('0');
 
-        DB.edit_data((data) => {
+        DB.read_data((data) => {
             test_tg.id = 0;
             expect(data.task_groups[0]).toEqual(test_tg);
         });
@@ -143,6 +143,78 @@ test("Delete non-existing Task Group", () => {
     expect.assertions(1);
     return fetch(BASE_URL + "task_groups/12345", {method: 'delete'})
     .then(res => {
+        expect(res.status).toEqual(404);
+        return res.text();
+    });
+});
+
+test("Modify valid Task Group", () => {
+    clean_db();
+
+    test_tg = {
+        name: "TG #1",
+        tasks: [1, 2, 3, 4]
+    };
+
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({ task_groups: { 0: test_tg } }));
+
+    test_tg.name = "Edited name";
+
+    expect.assertions(2);
+    return fetch(BASE_URL + "task_groups/0", {
+        method: 'put',
+        body: JSON.stringify(test_tg),
+        headers: { 'Content-Type': 'application/json' }
+    }).then(res => {
+        expect(res.status).toEqual(200);
+        return res.text();
+    }).then((res) => {
+        test_tg.id = 0;
+
+        DB.read_data((data) => {
+            test_tg.id = 0;
+            expect(data.task_groups[0]).toEqual(test_tg);
+        });
+    });
+});
+
+test("Modify invalid Task Group", () => {
+    clean_db();
+
+    test_tg = {
+        name: "TG #1",
+        tasks: [1, 2, 3, 4]
+    };
+
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({ task_groups: { 0: test_tg } }));
+
+    test_tg.tasks = ['an', 'invalid', 'array'];
+
+    expect.assertions(1);
+    return fetch(BASE_URL + "task_groups/0", {
+        method: 'put',
+        body: JSON.stringify(test_tg),
+        headers: { 'Content-Type': 'application/json' }
+    }).then(res => {
+        expect(res.status).toEqual(400);
+        return res.text();
+    });
+});
+
+test("Modify non-existing Task Group", () => {
+    clean_db();
+
+    test_tg = {
+        name: "TG #1",
+        tasks: [1, 2, 3, 4]
+    };
+    
+    expect.assertions(1);
+    return fetch(BASE_URL + "task_groups/12345", {
+        method: 'put',
+        body: JSON.stringify(test_tg),
+        headers: { 'Content-Type': 'application/json' }
+    }).then(res => {
         expect(res.status).toEqual(404);
         return res.text();
     });
