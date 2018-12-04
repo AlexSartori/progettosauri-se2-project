@@ -86,7 +86,7 @@ test("Modify valid Exam", () => {
     return fetch(BASE_URL + "exams/0", {
         method: 'put',
         body: JSON.stringify(test_exam),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json', 'user': 12 }
     }).then(res => {
         expect(res.status).toEqual(200);
         return res.text();
@@ -125,7 +125,7 @@ test("Modify invalid Exam", () => {
     return fetch(BASE_URL + "exams/" + EXAM_ID, {
         method: 'put',
         body: JSON.stringify(test_exam),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json', 'user': 2}
     }).then(res => {
         expect(res.status).toEqual(400);
         return res.text();
@@ -149,9 +149,39 @@ test("Modify non-existing Exam", () => {
     return fetch(BASE_URL + "exams", {
         method: 'put',
         body: JSON.stringify(test_exam),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json', 'user': 6 }
     }).then(res => {
         expect(res.status).toEqual(404);
+        return res.text();
+    });
+});
+
+test("Modify unauthorized Exam", () => {
+    let test_exam = {
+        name: 'Test Exam',
+        taskGroup: 0,
+        mode: 'exam',
+        class: 5,
+        TA: [2, 12, 6],
+        deadline: '2018-12-21 20:00',
+        duration: 120,
+        start: '2018-12-15 08:00'
+    };
+
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({
+        exams: { 0: test_exam }
+    }));
+
+    // Modify exam
+    test_exam.name = "New Name";
+
+    expect.assertions(1);
+    return fetch(BASE_URL + "exams/0", {
+        method: 'put',
+        body: JSON.stringify(test_exam),
+        headers: { 'Content-Type': 'application/json', 'user': 12345 }
+    }).then(res => {
+        expect(res.status).toEqual(403);
         return res.text();
     });
 });
@@ -194,8 +224,6 @@ test("Get non-existing Exam", () => {
 });
 
 test("Delete existing Exam", () => {
-    let EXAM_ID = 0;
-
     fs.writeFileSync(DB.DB_PATH, JSON.stringify({
         exams: {
             0: {
@@ -213,9 +241,40 @@ test("Delete existing Exam", () => {
     }));
 
     expect.assertions(1);
-    return fetch(BASE_URL + "exams/" + EXAM_ID, {method: 'delete'})
-    .then(res => {
+    return fetch(BASE_URL + "exams/0", {
+        method: 'delete',
+        headers: { 'user': 12 }
+    }).then(res => {
         expect(res.status).toEqual(200);
+        return res.text();
+    }).then(() =>
+        clean_db()
+    );
+});
+
+test("Delete unauthorized Exam", () => {
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({
+        exams: {
+            0: {
+                id: 0,
+                name: 'Exam #1',
+                taskGroup: 121,
+                mode: 'crowd sourcing',
+                class: 18,
+                TA: [12],
+                deadline: '2019-01-15 23:59',
+                duration: 120,
+                start: '2019-01-15 00:00'
+            }
+        }
+    }));
+
+    expect.assertions(1);
+    return fetch(BASE_URL + "exams/0", {
+        method: 'delete',
+        headers: { user: 12345 }
+    }).then(res => {
+        expect(res.status).toEqual(403);
         return res.text();
     }).then(() =>
         clean_db()
