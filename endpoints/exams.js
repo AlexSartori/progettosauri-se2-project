@@ -10,12 +10,14 @@ function register_endpoints(app) {
 function get_exam(req, res) {
     if (!req.params.exam_id || isNaN(parseInt(req.params.exam_id)))
         res.status(400).send("Invalid ID");
-    DB.edit_data((data) => {
-        if (data.exams && data.exams[req.params.exam_id])
-            res.status(200).send(JSON.stringify(data.exams[req.params.exam_id]));
-        else
-            res.status(404).send("No such exam");
-    });
+    else {
+        DB.edit_data((data) => {
+            if (data.exams && data.exams[req.params.exam_id])
+                res.status(200).send(JSON.stringify(data.exams[req.params.exam_id]));
+            else
+                res.status(404).send("No such exam");
+        });
+    }
 }
 
 function delete_exam(req, res) {
@@ -36,8 +38,8 @@ function create_exam(req, res) {
     valid &= param.taskGroup != undefined && typeof(param.taskGroup) == 'number';
     valid &= param.mode != undefined && typeof(param.mode) == 'string' && (param.mode == 'exam' || param.mode == 'crowd sourcing');
     valid &= param.class != undefined && typeof(param.class) == 'number';
-    valid &= param.TA != undefined && typeof(param.TA) == 'object' && param.TA.length > 0;
-    if (valid) param.TA.forEach((ta) => { valid &= typeof(ta) == 'number' });
+    valid &= param.TA != undefined && Array.isArray(param.TA) &&
+             param.TA.length > 0 && param.TA.every((a) => typeof(a) == 'number');
     valid &= new Date(param.deadline).toString() !== "Invalid Date";
     valid &= param.duration != undefined && typeof(param.duration) == 'number';
     valid &= new Date(param.start).toString() !== "Invalid Date";
