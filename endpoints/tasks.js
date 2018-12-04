@@ -109,19 +109,21 @@ function delete_task(req, res) {
 
 function get_available_tasks(req, res) {
   let result = [];
-  let user = parseInt(req.get('user'));
-  if(user != NaN) {
-    DB.read_data((data) => {
-      if (data.tasks) {
-        Object.keys(data.tasks).forEach(function(k) {
-          let task = data.tasks[k.toString()];
-          if(task.creator == user) result.push(k);
-        });
-      }
-    });
-    res.status(200).send(result);
+  if(!req.params.user) {
+    res.status(400).send("Bad parameters");
   } else {
-    res.start(400).send();
+    let user = parseInt(req.get('user'));
+    if(user != NaN) {
+      DB.read_data((data) => {
+        if (data.tasks) {
+          Object.keys(data.tasks).forEach(function(k) {
+            let task = data.tasks[k.toString()];
+            if(task.creator == user) result.push(k);
+          });
+        }
+      });
+      res.status(200).send(result);
+    }
   }
 }
 
