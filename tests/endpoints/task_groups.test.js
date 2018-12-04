@@ -118,6 +118,36 @@ test("Get all Task Groups", () => {
     });
 });
 
+test("Delete existing Task Group", () => {
+    clean_db();
+
+    test_tg = {
+        id: 0,
+        name: "TG #1",
+        tasks: [1, 2, 3, 4]
+    };
+
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({ task_groups: { 0: test_tg } }));
+
+    expect.assertions(1);
+    return fetch(BASE_URL + "task_groups/0", {method: 'delete'})
+    .then(res => {
+        expect(res.status).toEqual(200);
+        return res.text();
+    });
+});
+
+test("Delete non-existing Task Group", () => {
+    clean_db();
+
+    expect.assertions(1);
+    return fetch(BASE_URL + "task_groups/12345", {method: 'delete'})
+    .then(res => {
+        expect(res.status).toEqual(404);
+        return res.text();
+    });
+});
+
 afterAll(() => {
     clean_db();
     server.close();
