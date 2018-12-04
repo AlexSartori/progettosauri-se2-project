@@ -112,11 +112,12 @@ function get_available_tasks(req, res) {
   let user = parseInt(req.get('user'));
   if(user != NaN) {
     DB.read_data((data) => {
-      if (data.taks) 
-        Object.keys(data.task).forEach(function(k) {
-          console.log(k);
-          if(k.creator == user) result.push(k);
+      if (data.tasks) {
+        Object.keys(data.tasks).forEach(function(k) {
+          let task = data.tasks[k.toString()];
+          if(task.creator == user) result.push(k);
         });
+      }
     });
     res.status(200).send(result);
   } else {
