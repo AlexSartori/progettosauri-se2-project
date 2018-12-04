@@ -14,6 +14,7 @@ function create_task(req, res) {
   // Checks if the user id is provided and stores it
   let user = parseInt(req.get('user'));
   valid &= user != NaN;
+  let id;
 
   if (valid) {
     new_task = {
@@ -57,17 +58,16 @@ function create_task(req, res) {
       // Writes in the DB
       if (valid) {
         new_task.id = data.tasks_next_id++;
+        id = new_task.id;
         data.tasks[new_task.id] = new_task;
       }
     });
   }
 
   if(valid)
-    res.status(201);
+    res.status(201).send('' + id);
   else
-    res.status(400);
-
-  res.send();
+    res.status(400).send();
 }
 
 function delete_task(req, res) {

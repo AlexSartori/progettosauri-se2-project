@@ -39,7 +39,7 @@ afterAll(() => {
 
 // POST /tasks
 test('Successful create task open answer', () => {
-  expect.assertions(5);
+  expect.assertions(6);
   new_task = {
     'text': 'Question1',
     'answers': []
@@ -62,11 +62,14 @@ test('Successful create task open answer', () => {
       expect(obj.answers.length).toEqual(undefined);
       expect(obj.creator).toEqual(0);
     });
-  });
+
+    return res.text();
+    }).then(text =>
+      expect(text).toEqual('0'));
 });
 
 test('Successful create task multiple choice answer', () => {
-  expect.assertions(6);
+  expect.assertions(7);
   new_task = {
     'text': 'Question2',
     'answers': [{'text':'answer1','correct': true},
@@ -91,7 +94,10 @@ test('Successful create task multiple choice answer', () => {
       expect(obj.answers[0]).toEqual({'text':'answer1','correct': true, 'id':0});
       expect(obj.answers[1]).toEqual({'text':'answer2','correct': false, 'id':1});
     });
-  });
+
+    return res.text();
+    }).then(text =>
+      expect(text).toEqual('1'));
 });
 
 test('Fail create task multiple choice answer bad format', () => {
