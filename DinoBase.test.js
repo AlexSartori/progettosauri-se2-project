@@ -36,7 +36,7 @@ test("Database Read", () => {
     fs.writeFileSync(DB.DB_PATH, '{"prova":{"what":"An object","why":["for","testing"]}}');
 
     read = {};
-    DB.edit_data((data) => {
+    DB.read_data((data) => {
         read = data;
     });
 
