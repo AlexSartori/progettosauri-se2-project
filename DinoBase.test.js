@@ -4,12 +4,11 @@ const fs = require('fs');
 
 // Clear test DB before and after
 beforeAll(() => {
-    process.env.TESTING = true;
-    fs.writeFileSync(DB.DB_TEST_PATH, "{}");
+    fs.writeFileSync(DB.DB_PATH, "{}");
 });
 
 afterAll(() => {
-    fs.writeFileSync(DB.DB_TEST_PATH, "{}");
+    fs.writeFileSync(DB.DB_PATH, "{}");
 });
 
 
@@ -23,7 +22,7 @@ test("Database Write", () => {
     });
 
     // Check what was written
-    data = JSON.parse(fs.readFileSync(DB.DB_TEST_PATH, 'utf8'));
+    data = JSON.parse(fs.readFileSync(DB.DB_PATH, 'utf8'));
     expect(data).toEqual({
         'prova': {
             'what': 'An object',
@@ -34,7 +33,7 @@ test("Database Write", () => {
 
 
 test("Database Read", () => {
-    fs.writeFileSync(DB.DB_TEST_PATH, '{"prova":{"what":"An object","why":["for","testing"]}}');
+    fs.writeFileSync(DB.DB_PATH, '{"prova":{"what":"An object","why":["for","testing"]}}');
 
     read = {};
     DB.edit_data((data) => {

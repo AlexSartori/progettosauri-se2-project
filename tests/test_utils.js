@@ -15,7 +15,11 @@ function create_valid_user(){
       'next_user_id': 1
     }
     fs.writeFileSync(DB.DB_PATH, JSON.stringify(user))
+<<<<<<< HEAD
   //  return user.users[0]
+=======
+    return user
+>>>>>>> develop
 }
 
 
@@ -52,6 +56,7 @@ function create_unvalid_user(){
     'next_user_id': 1
   }
 
+<<<<<<< HEAD
   fs.writeFileSync(DB.DB_PATH, JSON.stringify(user))
   return user.users[0]
 }
@@ -62,3 +67,14 @@ function clean_db(){
 }
 
 module.exports = {create_valid_user, clean_db, create_unvalid_user, create_multiple_users}
+=======
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify(user))
+    return user
+}
+
+function clean_db(){
+    fs.writeFileSync(DB.DB_PATH, '{}');
+}
+
+module.exports = {create_valid_user, clean_db, create_unvalid_user}
+>>>>>>> develop

@@ -40,6 +40,8 @@ paths:
       responses:
         201:
           description: Success, user has been created
+          schema:
+            $ref: "#/definitions/IdPost"
         400:
           description: Invalid parameters
 
@@ -169,6 +171,8 @@ paths:
       responses:
         201:
           description: Success, exam has been created
+          schema:
+            $ref: "#/definitions/IdPost"
         400:
           description: Bad parameter
         404:
@@ -339,6 +343,8 @@ paths:
       responses:
         201:
           description: Success
+          schema:
+            $ref: "#/definitions/IdPost"
         400:
           description: Bad parameter
         403:
@@ -436,6 +442,8 @@ paths:
       responses:
         201:
           description: Success, submitted
+          schema:
+            $ref: "#/definitions/IdPost"
         400:
           description: Bad parameter
         403:
@@ -518,6 +526,8 @@ paths:
       responses:
         201:
           description: Success, task has been created
+          schema:
+            $ref: "#/definitions/IdPost"
         400:
           description: Bad parameters
 
@@ -592,6 +602,8 @@ paths:
       responses:
         200:
           description: Success
+        400:
+          description: Bad parameters
         403:
           description: Permission denied
         404:
@@ -632,6 +644,8 @@ paths:
       responses:
         201:
           description: Success, created
+          schema:
+            $ref: "#/definitions/IdPost"
         400:
           description: Bad parameters
 
@@ -754,6 +768,8 @@ paths:
       responses:
         201:
           description: Success, a task group has been created
+          schema:
+            $ref: "#/definitions/IdPost"
         400:
           description: Bad parameters
 
@@ -944,6 +960,8 @@ paths:
       responses:
         201:
           description: Success, resource created
+          schema:
+            $ref: "#/definitions/IdPost"
         400:
           description: Bad parameters
         404:
@@ -1035,6 +1053,8 @@ paths:
       responses:
         201:
           description: Success
+          schema:
+            $ref: "#/definitions/IdPost"
         400:
           description: Bad parameter
         403:
@@ -1082,6 +1102,13 @@ paths:
 ##################################################################   Definitions
 definitions:
 
+  IdPost:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: "ID of the created object"
+
   User:
     type: object
     properties:
@@ -1097,9 +1124,6 @@ definitions:
       name:
         type: string
         description: "Name of the user"
-      surname:
-        type: string
-        description: "Surname of the user"
 
   UserPost:
     type: object
@@ -1113,14 +1137,10 @@ definitions:
       name:
         type: string
         description: "Name of the user"
-      surname:
-        type: string
-        description: "Surname of the user"
     required:
       - email
       - password
       - name
-      - surname
 
   UserPut:
     type: object
@@ -1134,9 +1154,6 @@ definitions:
       name:
         type: string
         description: "Name of the user"
-      surname:
-        type: string
-        description: "Surname of the user"
 
   Task:
     type: object

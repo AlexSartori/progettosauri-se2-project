@@ -1,52 +1,32 @@
 const DB = require('../DinoBase');
 
 function register_endpoints(app) {
-    app.post('/exams', create_exam);
     app.get('/exams/:exam_id', get_exam);
+    app.post('/exams', create_exam);
     app.delete('/exams/:exam_id', delete_exam);
     app.put('/exams/:exam_id', edit_exam);
 }
 
 function get_exam(req, res) {
-    let found = false;
-
+    if (!req.params.exam_id || isNaN(parseInt(req.params.exam_id)))
+        res.status(400).send("Invalid ID");
     DB.edit_data((data) => {
-        if (!data['exams']) return;
-
-        data['exams'].forEach((e) => {
-            if (e.key == req.params.exam_id)
-                found = e;
-        });
+        if (data.exams && data.exams[req.params.exam_id])
+            res.status(200).send(JSON.stringify(data.exams[req.params.exam_id]));
+        else
+            res.status(404).send("No such exam");
     });
-
-    if (found) {
-        let exam = found.value;
-        exam.id = found.key;
-        res.status(200).send(JSON.stringify(exam));
-    } else {
-        res.status(404).send("No such exam");
-    }
 }
 
 function delete_exam(req, res) {
-    let found = false;
-
     DB.edit_data((data) => {
-        if (data['exams']) {
-            for (let i = 0; i < data['exams'].length; i++) {
-                if (data['exams'][i].key == req.params.exam_id) {
-                    found = true;
-                    data['exams'].splice(i, 1);
-                }
-            }
+        if (data.exams && data.exams[req.params.exam_id]) {
+            delete data.exams[req.params.exam_id];
+            res.status(200).send();
+        } else {
+            res.status(404).send("No such exam");
         }
     });
-
-    if (found) {
-        res.status(200).send();
-    } else {
-        res.status(404).send("No such exam");
-    }
 }
 
 function create_exam(req, res) {
@@ -66,11 +46,11 @@ function create_exam(req, res) {
         res.status(400).send();
     } else {
         DB.edit_data((data) => {
-            if(typeof data['exams'] == 'undefined') data['exams'] = [];
-            next_id = Object.keys(data['exams']).sort().length+1;
+            if (!data.exams) data.exams = { exams_next_id: 0 };
+            next_id = data.exams.exams_next_id++;
             new_exam = param;
             new_exam.id = next_id;
-            data['exams'].push({key: next_id, value: new_exam});
+            data.exams[next_id] = new_exam;
         });
 
         res.status(201).send('' + next_id);
@@ -90,26 +70,19 @@ function edit_exam(req, res) {
     valid &= param.duration != undefined && typeof(param.duration) == 'number';
     valid &= new Date(param.start).toString() !== "Invalid Date";
 
+    let id = parseInt(req.params.exam_id);
     if (!valid) {
         res.status(400).send();
+    } else if (!data.exams || !data.exams[id]) {
+        res.status(404).send("No such exam");
     } else {
-        let found = false;
-
         DB.edit_data((data) => {
-            if(data['exams']) {
-                for (let i = 0; i < data['exams'].length; i++)
-                    if (data['exams'][i].key == req.params.exam_id)
-                        found = data['exams'][i];
-                found.value = param;
-            }
+            new_exam = param;
+            new_exam.id = parseInt(id);
+            data.exams[id] = new_exam;
+            res.status(200).send(JSON.stringify(new_exam));
         });
-
-        if (found)
-            res.status(200).send();
-        else {
-            res.status(404).send("No such exam");
-        }
     }
 }
 
-module.exports = {register_endpoints};
+module.exports = { register_endpoints };
