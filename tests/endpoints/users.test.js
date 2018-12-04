@@ -21,8 +21,7 @@ afterAll(() => {
 // - not enough parameters (should be done for every param)
 test('create_user, invalid, not enough parameters', () => {
   clean_db();
-  var user = {'name': 'test_user',
-              'password': 'test'}
+  var user = {'name': 'test_user','password': 'test'}
   expect.assertions(2);
     return fetch(BASE_URL + USER_URL, {
         method: 'POST',
@@ -37,13 +36,46 @@ test('create_user, invalid, not enough parameters', () => {
     })
 });
 
-// INVALID TESTS
-// - wrong type parameters (should be done for every param)
-test('create_user, invalid, not enough parameters', () => {
+// - wrong type parameters
+test('create_user, invalid, wrong type parameters', () => {
   clean_db();
-  var user = {'name': 'test_user',
-              'mail': 'mail@mail',
-              'password': 5 }
+  var user = {'name': 'test_user','mail': 'mail@mail','password': 5 }
+  expect.assertions(2);
+    return fetch(BASE_URL + USER_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(user)
+    }).then(response => {
+        expect(response.status).toEqual(400);
+        return response.text()
+    }).then(text => {
+        expect(text).toEqual("Bad parameter")
+        clean_db()
+    })
+});
+
+// - wrong type parameters
+test('Create_user, invalid, wrong type parameters', () => {
+  clean_db();
+  var user = {'name': 'test_user','mail': 5,'password': 'pass'}
+  expect.assertions(2);
+    return fetch(BASE_URL + USER_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(user)
+    }).then(response => {
+        expect(response.status).toEqual(400);
+        return response.text()
+    }).then(text => {
+        expect(text).toEqual("Bad parameter")
+        clean_db()
+    })
+});
+
+// - wrong type parameters
+test('Create_user, invalid, wrong type parameters', () => {
+  clean_db();
+  var user = {'name':2,'mail':'mail@mail','password':'pass' }
   expect.assertions(2);
     return fetch(BASE_URL + USER_URL, {
         method: 'POST',
@@ -60,12 +92,10 @@ test('create_user, invalid, not enough parameters', () => {
 
 
 // VALID TEST
-test('create_user, valid parameters', () => {
+test('create_user, valid parameters, first user', () => {
   clean_db();
-  var user = {'name': 'test_user',
-              'mail': 'mail@test.com',
-              'password': 'test'}
-  expect.assertions(2);
+  var user = {'name':'test_user','mail':'mail@test.com','password':'test'}
+  expect.assertions(3);
     return fetch(BASE_URL + USER_URL, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -74,8 +104,34 @@ test('create_user, valid parameters', () => {
         expect(response.status).toEqual(201);
         return response.text()
     }).then( new_id => {
-        user.id=new_id
-        return fetch(BASE_URL + USER_URL + new_id)
+        user.id=parseInt(new_id)
+        return fetch(BASE_URL + USER_URL + user.id)
+    }).then(res => {
+        expect(res.status).toEqual(200);
+        return res.json()
+    }).then(text => {
+        expect(text).toEqual(user)
+        clean_db()
+    })
+})
+
+test('create_user, valid parameters, not first user', () => {
+  clean_db();
+  create_users();
+  var user = {'name': 'test_user',
+              'mail': 'mail@test.com',
+              'password': 'test'}
+  expect.assertions(3);
+    return fetch(BASE_URL + USER_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(user)
+    }).then(response => {
+        expect(response.status).toEqual(201);
+        return response.text()
+    }).then( new_id =>  {
+        user.id=parseInt(new_id)
+        return fetch(BASE_URL + USER_URL + user.id)
     }).then(res => {
         expect(res.status).toEqual(200);
         return res.json()
@@ -97,7 +153,7 @@ test('Get user test, valid ID, users exist', () => {
         expect(res.status).toEqual(200);
         return res.json()
     }).then(text => {
-       DB.edit_data((data) => {
+       DB.read_data((data) => {
          expect(text).toEqual(data.users[0])
        })
       clean_db()
@@ -233,8 +289,8 @@ test('Delete user test, user_ID not in db', () => {
 test("Edit user details, valid test", () => {
     ID = 0
     var user = create_users()
-    user.users[0].name = 'newname'
-    user.users[0].surname='newsurname'
+    user.users[ID].name = 'newname'
+    user.users[ID].password='newpass'
     expect.assertions(2);
     return fetch(BASE_URL+USER_URL+ID, {
             method: 'PUT',
@@ -245,7 +301,7 @@ test("Edit user details, valid test", () => {
         expect(res.status).toEqual(200);
         return res.json();
     }).then( text => {
-      DB.edit_data((data) =>  {
+      DB.read_data((data) =>  {
         expect(text).toEqual(data.users[ID])
       })
       clean_db()
@@ -253,8 +309,127 @@ test("Edit user details, valid test", () => {
 })
 
 //INVALID tests
-// - user_id diffrent from user in header
+// - user_id (ID1) different from user in header (ID0) (permission denied)
+test("Edit user details, invalid test, permission denied", () => {
+    ID0 = 0
+    ID1 = 1
+    var user = create_users()
+    user.users[ID0].name = 'newname'
+    user.users[ID0].password='newpass'
+    expect.assertions(2);
+    return fetch(BASE_URL+USER_URL+ID0, {
+            method: 'PUT',
+            headers: {'Content-Type':'application/json',
+                      'user' : ID1},
+            body: JSON.stringify(user.users[0])
+    }).then( res => {
+        expect(res.status).toEqual(403);
+        return res.text();
+    }).then( text => {
+        expect(text).toEqual("Permission denied, you are trying to edit an other user's account")
+        clean_db()
+    })
+})
 // - invalid user_id (<0)
+test("Edit user details, invalid test, user_id <0", () => {
+    ID0 = 0
+    ID1 = -1
+    var user = create_users()
+    user.users[ID0].name = 'newname'
+    user.users[ID0].password='newpassword'
+    expect.assertions(2);
+    return fetch(BASE_URL+USER_URL+ID0, {
+            method: 'PUT',
+            headers: {'Content-Type':'application/json',
+                      'user' : ID1},
+            body: JSON.stringify(user.users[0])
+    }).then( res => {
+        expect(res.status).toEqual(400);
+        return res.text();
+    }).then( text => {
+        expect(text).toEqual("Bad parameter")
+        clean_db()
+    })
+})
 // - invalid user_Id (not a number)
+test("Edit user details, invalid test, user_id is not a number", () => {
+    ID0 = 0
+    ID1 = "string"
+    var user = create_users()
+    user.users[ID0].name = 'newname'
+    user.users[ID0].password='newpass'
+    expect.assertions(2);
+    return fetch(BASE_URL+USER_URL+ID0, {
+            method: 'PUT',
+            headers: {'Content-Type':'application/json',
+                      'user' : ID1},
+            body: JSON.stringify(user.users[0])
+    }).then( res => {
+        expect(res.status).toEqual(400);
+        return res.text();
+    }).then( text => {
+        expect(text).toEqual("Bad parameter")
+        clean_db()
+    })
+})
+// - user not found
+test('Edit user test, user_ID not in db', () => {
+  ID0 = 0
+  var user = create_users()
+  user.users[ID0].name = 'newname'
+  user.users[ID0].password='newpass'
+  clean_db();
+  expect.assertions(2);
+  return fetch(BASE_URL + USER_URL+ ID0,  {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json',
+                'user' : ID0 },
+      body: JSON.stringify(user.users[ID0])
+    }).then(res => {
+        expect(res.status).toEqual(404);
+        return res.text();
+    }).then(text =>
+        expect(text).toEqual('User does not exist'));
+        clean_db()
+});
+
 // - invalid body (not all parameters)
+test('Edit user test, missing some parameter', () => {
+  ID0 = 0
+  var user = create_users()
+  user.users[ID0].name = 'newname'
+  user.users[ID0].password='newpass'
+  delete user.users[ID0].mail
+  expect.assertions(2);
+  return fetch(BASE_URL + USER_URL+ ID0,  {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json',
+                'user' : ID0 },
+      body: JSON.stringify(user.users[ID0])
+    }).then(res => {
+        expect(res.status).toEqual(400);
+        return res.text();
+    }).then(text =>
+        expect(text).toEqual('Bad parameter'));
+        clean_db()
+});
+
 // - invalid body (not all parameters have correct type)
+test('Edit user test, wrong type parameters in body', () => {
+  ID0 = 0
+  var user = create_users()
+  user.users[ID0].name = 'newname'
+  user.users[ID0].mail= 5
+  expect.assertions(2);
+  return fetch(BASE_URL + USER_URL+ ID0,  {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json',
+                'user' : ID0 },
+      body: JSON.stringify(user.users[ID0])
+    }).then(res => {
+        expect(res.status).toEqual(400);
+        return res.text();
+    }).then(text =>
+        expect(text).toEqual('Bad parameter'));
+        clean_db()
+});

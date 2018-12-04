@@ -17,7 +17,7 @@ function create_users(){
         'password': 'test'
       }
     },
-      'next_user_id': 2
+      'users_next_id': 2
     }
     fs.writeFileSync(DB.DB_PATH, JSON.stringify(users))
   return users

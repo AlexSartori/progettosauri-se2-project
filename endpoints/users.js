@@ -4,7 +4,7 @@ function register_endpoints(app) {
     app.post('/users', create_user);
     app.get('/users/:user_id', get_user_details);
     app.delete('/users/:user_id', delete_user);
-    app.put('/users/:user_id',edit_user_details)
+    app.put('/users/:user_id',edit_user_details);
 }
 
 // Check path validity
@@ -14,7 +14,8 @@ function check_path(id){
   } else {
     return true}
 }
-  // Check body validity
+
+// Check body validity
 function check_body(param) {
     valid = true;
     valid &= param.name != undefined && typeof(param.name) == 'string';
@@ -23,42 +24,43 @@ function check_body(param) {
     return valid
 }
 
+// POST /users
 function create_user(req, res) {
   //check the required parameters
-    if (!check_body(req.body)){
+  if (!check_body(req.body)){
         //not valid parameters
-        res.statusCode = 400;
-        res.send('Bad parameter');
+        res.status(400).send('Bad parameter');
     } else {
         DB.edit_data((data) => {
-          //check if it's the first user and if the param users_next_id is already defined in db
-       if(typeof data.users[users] == 'undefined') {
-            data.users_next_id = -1
-          }
-
-        //save the data in the database
-       var id = data.users_next_id++
-       var new_user =  {'id': id,
-                        'name': req.body.name,
-                        'mail': req.body.mail,
-                        'password': req.body.password }
-        data.users[id] =  req.body//new_user
-        data.users_next_id++
+        //check if it's the first user
+       if(!data.users) {
+          data.users= {}
+          data.users_next_id = 0
+       }
+       //save data in database
+       var id = data.users_next_id
+       var user = {'id':id,
+                  'name':req.body.name,
+                  'mail':req.body.mail,
+                  'password':req.body.password}
+       data.users[id] = user
+       data.users_next_id++
         //send status code
-        res.status(201).send(data.users[id].id);
+       res.status(201)
+       res.send(id.toString());
       });
-
-
   }
 }
 
+// GET /users/:user_id
 function get_user_details(req, res){
+  //Check required parameters
     if (!check_path(req.params.user_id)){
         res.status(400).send("Bad parameter, user_id should be a positive integer")
     } else {
         DB.edit_data((data) => {
-        //check if the user exists
-            if (typeof(data.users[req.params.user_id])!=undefined){
+        //check if the user exists else sende error
+            if (data.users && typeof(data.users[req.params.user_id])!=undefined){
                 res.status(200).send(data.users[req.params.user_id])
             } else {
                res.status(404).send("User does not exist")
@@ -68,18 +70,19 @@ function get_user_details(req, res){
     }
 }
 
+// DELETE /users/:user_id
 function delete_user(req, res){
+  // Check parameters
   if (!check_path(req.params.user_id)){
         res.status(400).send("Bad parameter, user_id should be a positive integer")
   } else {
-        //check permissions
+        //Check permissions
         if (req.get('user') != req.params.user_id){
             res.status(403).send("Permission denied, you are trying to delete an other user's account")
         } else {
             DB.edit_data((data) => {
-                //check if the user exists
-                found = false
-                if ((typeof(data.users[req.params.user_id])!=undefined)){
+                //Check: if the user exists delete it else send error
+                if (data.users && (typeof(data.users[req.params.user_id])!=undefined)){
                   delete data.users[req.params.user_id]
                   res.status(200).send("Success, account has been deleted")
                 } else {
@@ -90,18 +93,19 @@ function delete_user(req, res){
   }
 }
 
-
+// PUT users/:user_id
 function edit_user_details(req, res) {
-  if (!check_body(req.body) || !check_path(req.params.user_id)) {
+  //Check parameters
+  if (!check_body(req.body) || !check_path(req.params.user_id) || !check_path(req.get('user'))) {
     res.status(400).send("Bad parameter");
   } else {
-      //check permissions
+      //Check permissions
       if (req.get('user') != req.params.user_id){
-        res.status(403).send("Permission denied, you are trying to delete an other user's account")
+        res.status(403).send("Permission denied, you are trying to edit an other user's account")
       } else {
         DB.edit_data((data) => {
-          // Check if user exists
-            if(data.users[req.params.user_id]) {
+          // Check if user exists else send error
+            if(data.users && typeof(data.users[req.params.user_id])!=undefined) {
                 data.users[req.params.user_id] = req.body;
                 res.status(200).send(data.users[req.params.user_id])
             } else {
