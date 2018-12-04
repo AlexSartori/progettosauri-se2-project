@@ -175,8 +175,6 @@ paths:
             $ref: "#/definitions/IdPost"
         400:
           description: Bad parameter
-        404:
-          description: Resource not found
 
   /exams/{exam_id}:
     # Info about an exam
@@ -201,7 +199,7 @@ paths:
         400:
           description: Bad parameter
         403:
-          description: Permission denied
+          description: The authenticated user is not the creator of this exam or is not enrolled.
         404:
           description: Exam does not exist
 

@@ -23,8 +23,13 @@ function get_exam(req, res) {
 function delete_exam(req, res) {
     DB.edit_data((data) => {
         if (data.exams && data.exams[req.params.exam_id]) {
-            delete data.exams[req.params.exam_id];
-            res.status(200).send();
+            let ex = data.exams[req.params.exam_id];
+            if (ex.TA.some((ta) => ta == parseInt(req.get('user')))) {
+                delete data.exams[req.params.exam_id];
+                res.status(200).send();
+            } else {
+                res.status(403).send("Permission denied");
+            }
         } else {
             res.status(404).send("No such exam");
         }
@@ -79,10 +84,14 @@ function edit_exam(req, res) {
         res.status(404).send("No such exam");
     } else {
         DB.edit_data((data) => {
-            new_exam = param;
-            new_exam.id = parseInt(id);
-            data.exams[id] = new_exam;
-            res.status(200).send(JSON.stringify(new_exam));
+            if (data.exams[id].TA.some((ta) => ta == parseInt(req.get('user')))) {
+                new_exam = param;
+                new_exam.id = parseInt(id);
+                data.exams[id] = new_exam;
+                res.status(200).send(JSON.stringify(new_exam));
+            } else {
+                res.status(403).send("Permission denied");
+            }
         });
     }
 }
