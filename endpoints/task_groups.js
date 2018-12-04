@@ -1,9 +1,23 @@
 const DB = require('../DinoBase');
 
 function register_endpoints(app) {
+    // app.get('/task_groups', get_all_tgs);
+    app.get('/task_groups/:tg_id', get_tg);
     app.post('/task_groups', create_tg);
 }
 
+function get_tg(req, res) {
+    if (!req.params.tg_id || isNaN(parseInt(req.params.tg_id)))
+        res.status(400).send("Invalid ID");
+    else {
+        DB.edit_data((data) => {
+            if (data.task_groups && data.task_groups[req.params.tg_id])
+                res.status(200).send(data.task_groups[req.params.tg_id]);
+            else
+                res.status(404).send("No such exam");
+        });
+    }
+}
 
 function create_tg(req, res) {
     let valid = true, param = req.body;
