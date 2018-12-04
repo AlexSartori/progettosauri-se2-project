@@ -287,3 +287,45 @@ test('Successful get details of a task', () => {
     });
   });
 });
+
+test('Fail get details of a task, no permission', () => {
+  expect.assertions(1);
+  new_task = {
+    'text': 'Question1',
+    'answers': []
+  };
+  return fetch(BASE_URL, {
+    method: 'POST',
+    body: JSON.stringify(new_task),
+    headers: {
+      'Content-Type': 'application/json',
+      'user': 0
+    }
+  })
+  .then(res => res.text()).then(res => {;
+    let id = res;
+    return fetch(BASE_URL + '/' + id, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'user': 1
+      }
+    }).then(res => {
+      expect(res.status).toEqual(403);
+    })
+  });
+});
+
+test('Fail get details of a task, not exists', () => {
+  expect.assertions(1);
+  let id = '-1';
+  return fetch(BASE_URL + '/' + id, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'user': 1
+      }
+    }).then(res => {
+      expect(res.status).toEqual(404);
+    })
+});
