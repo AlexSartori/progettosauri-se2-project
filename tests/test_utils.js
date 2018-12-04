@@ -1,30 +1,8 @@
 const fs = require('fs');
 const DB = require('../DinoBase');
 
-//creates a single valid user
-function create_valid_user(){
-    var user =
-    {'users': {
-      '0': {
-        'id': 0,
-        'name': 'test_user',
-        'mail': 'mail@test.com',
-        'password': 'test'
-      }
-    },
-      'next_user_id': 1
-    }
-    fs.writeFileSync(DB.DB_PATH, JSON.stringify(user))
-<<<<<<< HEAD
-  //  return user.users[0]
-=======
-    return user
->>>>>>> develop
-}
-
-
-function create_multiple_users(){
-    var user =
+function create_users(){
+    var users =
     {'users': {
       '0': {
         'id': 0,
@@ -41,40 +19,13 @@ function create_multiple_users(){
     },
       'next_user_id': 2
     }
-    fs.writeFileSync(DB.DB_PATH, JSON.stringify(user))
-  //  return user.users[0]
-}
-
-
-function create_unvalid_user(){
-    var user= {'users': {
-      '0': {
-        'id': 0,
-        'name': 'test_user'
-      }
-    },
-    'next_user_id': 1
-  }
-
-<<<<<<< HEAD
-  fs.writeFileSync(DB.DB_PATH, JSON.stringify(user))
-  return user.users[0]
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify(users))
+  return users
 }
 
 function clean_db(){
-    fs.writeFileSync(DB.DB_PATH, {})
+    fs.writeFileSync(DB.DB_PATH, '{}')
     return
 }
 
-module.exports = {create_valid_user, clean_db, create_unvalid_user, create_multiple_users}
-=======
-    fs.writeFileSync(DB.DB_PATH, JSON.stringify(user))
-    return user
-}
-
-function clean_db(){
-    fs.writeFileSync(DB.DB_PATH, '{}');
-}
-
-module.exports = {create_valid_user, clean_db, create_unvalid_user}
->>>>>>> develop
+module.exports = {create_users, clean_db}

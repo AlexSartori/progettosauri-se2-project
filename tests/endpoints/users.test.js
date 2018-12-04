@@ -3,9 +3,9 @@ const server = require('../../index').server;
 const PORT = require('../../index').PORT;
 const BASE_URL = `http://localhost:${PORT}/`;
 const USER_URL = 'users/'
-const create_valid_user = require('../test_utils').create_valid_user
-const create_multiple_users = require('../test_utils').create_multiple_users
+const create_users = require('../test_utils').create_users
 const clean_db = require('../test_utils').clean_db
+const DB = require('../../DinoBase');
 
 beforeAll(() => {
   clean_db()
@@ -16,7 +16,10 @@ afterAll(() => {
   server.close();
 });
 
-test('create_user invalid parameters', () => {
+// create_user tests:
+// INVALID TESTS
+// - not enough parameters (should be done for every param)
+test('create_user, invalid, not enough parameters', () => {
   clean_db();
   var user = {'name': 'test_user',
               'password': 'test'}
@@ -34,7 +37,30 @@ test('create_user invalid parameters', () => {
     })
 });
 
-test('create_user valid parameters', () => {
+// INVALID TESTS
+// - wrong type parameters (should be done for every param)
+test('create_user, invalid, not enough parameters', () => {
+  clean_db();
+  var user = {'name': 'test_user',
+              'mail': 'mail@mail',
+              'password': 5 }
+  expect.assertions(2);
+    return fetch(BASE_URL + USER_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(user)
+    }).then(response => {
+        expect(response.status).toEqual(400);
+        return response.text()
+    }).then(text => {
+        expect(text).toEqual("Bad parameter")
+        clean_db()
+    })
+});
+
+
+// VALID TEST
+test('create_user, valid parameters', () => {
   clean_db();
   var user = {'name': 'test_user',
               'mail': 'mail@test.com',
@@ -48,16 +74,13 @@ test('create_user valid parameters', () => {
         expect(response.status).toEqual(201);
         return response.text()
     }).then( new_id => {
-        var new_user = { 'id': new_id,
-                        'name': 'test_user',
-                        'mail': 'mail@test.com',
-                        'password': 'test'}
+        user.id=new_id
         return fetch(BASE_URL + USER_URL + new_id)
     }).then(res => {
         expect(res.status).toEqual(200);
-        return res.text()
+        return res.json()
     }).then(text => {
-        expect(text).toEqual(JSON.stringify(new_user))
+        expect(text).toEqual(user)
         clean_db()
     })
 })
@@ -66,7 +89,7 @@ test('create_user valid parameters', () => {
 //VALID TEST
 test('Get user test, valid ID, users exist', () => {
   //insert the user in db to make sure i get a valid response
-  create_valid_user()
+  create_users()
   expect.assertions(2);
   ID = 0
   return fetch(BASE_URL + USER_URL+ ID
@@ -74,14 +97,16 @@ test('Get user test, valid ID, users exist', () => {
         expect(res.status).toEqual(200);
         return res.json()
     }).then(text => {
-        expect(text).toEqual(data.users[0])
-        clean_db()
+       DB.edit_data((data) => {
+         expect(text).toEqual(data.users[0])
+       })
+      clean_db()
     })
 });
 
-// UNVALID TESTS:
+// invalid TESTS:
 // - user_id is not an integer
-test('Get user test, unvalid ID, not an integer', () => {
+test('Get user test, invalid ID, not an integer', () => {
     expect.assertions(2);
     ID = 'string'
     return fetch(BASE_URL + USER_URL+ ID
@@ -93,7 +118,7 @@ test('Get user test, unvalid ID, not an integer', () => {
  });
 
 // - user_id is not a positive integer
-test('Get user test, unvalid ID, negative integer ', () => {
+test('Get user test, invalid ID, negative integer ', () => {
     expect.assertions(2);
     ID = '-1'
     return fetch(BASE_URL + USER_URL+ ID,
@@ -105,7 +130,7 @@ test('Get user test, unvalid ID, negative integer ', () => {
 });
 
 // - user_id is not in db
-test('Get user test, unvalid ID, not found', () => {
+test('Get user test, invalid ID, not found', () => {
     clean_db()
     ID = 1
     expect.assertions(2);
@@ -121,7 +146,7 @@ test('Get user test, unvalid ID, not found', () => {
 // VALID TEST:
 // - user_id exists and it's equal to user in headers
 test('Delete user, valid test', () => {
-    create_valid_user();
+    create_users();
     expect.assertions(2);
     ID = 0
     return fetch(BASE_URL + USER_URL+ ID, {
@@ -136,11 +161,11 @@ test('Delete user, valid test', () => {
        clean_db()})
 });
 
-//UNVALID TESTS:
+//invalid TESTS:
 // - user_id != header user (both users have to exist)
 test('Delete user test, user_id is different from user in header', () => {
     clean_db();
-    create_multiple_users();
+    create_users();
     expect.assertions(2);
     ID = 0
     return fetch(BASE_URL + USER_URL+ ID, {
@@ -156,7 +181,7 @@ test('Delete user test, user_id is different from user in header', () => {
  });
 
 // - user_id is not an integer (user_id should be equal to user in headers)
-test('Delete user test, unvalid user_id, not an integer', () => {
+test('Delete user test, invalid user_id, not an integer', () => {
     expect.assertions(2);
     ID= 'string'
     return fetch(BASE_URL + USER_URL+ ID, {
@@ -172,7 +197,7 @@ test('Delete user test, unvalid user_id, not an integer', () => {
 
 
 // - user_id is not a positive integer (user_id should be equal to user in headers)
-test('Delete user test, unvalid user_id, negative integer ', () => {
+test('Delete user test, invalid user_id, negative integer ', () => {
     expect.assertions(2);
     ID= -1
     return fetch(BASE_URL + USER_URL+ ID, {
@@ -201,35 +226,35 @@ test('Delete user test, user_ID not in db', () => {
     }).then(text =>
         expect(text).toEqual('User does not exist'));
 });
-/*
+
 // edit_user_details tests:
 // VALID TESTS
 // - string type object in body (no other requirements), valid user_id in path, user exists, permission is valid
-test("Edit user details, valid test", (req,res) => {
+test("Edit user details, valid test", () => {
     ID = 0
-    var user =create_valid_user(ID)
-    user.value.name = 'newname'
-    user.value.surname='newsurname'
+    var user = create_users()
+    user.users[0].name = 'newname'
+    user.users[0].surname='newsurname'
     expect.assertions(2);
     return fetch(BASE_URL+USER_URL+ID, {
             method: 'PUT',
             headers: {'Content-Type':'application/json',
                       'user' : ID},
-            body: JSON.stringify(user)
+            body: JSON.stringify(user.users[0])
     }).then( res => {
         expect(res.status).toEqual(200);
-        return res.text();
+        return res.json();
     }).then( text => {
-        expect(text).toEqual(()=>{
-            return fetch(BASE_URL + USER_URL+ ID)
-            }).then(res => {
-                expect(res.status).toEqual(200);
-                return res.json()
-            }).then(text => {
-                expect(text).toEqual(data['users'][ID])
-                clean_db()
-            })
-
+      DB.edit_data((data) =>  {
+        expect(text).toEqual(data.users[ID])
+      })
+      clean_db()
     })
 })
-*/
+
+//INVALID tests
+// - user_id diffrent from user in header
+// - invalid user_id (<0)
+// - invalid user_Id (not a number)
+// - invalid body (not all parameters)
+// - invalid body (not all parameters have correct type)

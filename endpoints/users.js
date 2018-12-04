@@ -45,7 +45,7 @@ function create_user(req, res) {
         data.users[id] =  req.body//new_user
         data.users_next_id++
         //send status code
-        res.status(201).send(JSON.stringify(data.users[id].id));
+        res.status(201).send(data.users[id].id);
       });
 
 
