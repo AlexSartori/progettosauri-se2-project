@@ -1,30 +1,31 @@
 const fs = require('fs');
 const DB = require('../DinoBase');
 
-function create_valid_user(x){
-    var user= {"users":[{
-        "key":x,
-             "value":{"email":"prova@dinomail.com",
-             "password":"dinopwd",
-             "name":"dinoname",
-             "surname":"dinosurname"}}]
+function create_users(){
+    var users =
+    {'users': {
+      '0': {
+        'id': 0,
+        'name': 'test_user',
+        'mail': 'mail@test.com',
+        'password': 'test'
+      },
+      '1': {
+        'id': 1,
+        'name': 'test_user',
+        'mail': 'mail@test.com',
+        'password': 'test'
+      }
+    },
+      'users_next_id': 2
     }
-    fs.writeFileSync(DB.DB_PATH, JSON.stringify(user))
-    return user
-}
-
-function create_unvalid_user(x){
-    var user= {"users":[{
-        "key":x,
-             "value":{"email":"prova@dinomail.com"}}]
-    }
-
-    fs.writeFileSync(DB.DB_PATH, JSON.stringify(user))
-    return user
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify(users))
+  return users
 }
 
 function clean_db(){
-    fs.writeFileSync(DB.DB_PATH, '{}');
+    fs.writeFileSync(DB.DB_PATH, '{}')
+    return
 }
 
-module.exports = {create_valid_user, clean_db, create_unvalid_user}
+module.exports = {create_users, clean_db}
