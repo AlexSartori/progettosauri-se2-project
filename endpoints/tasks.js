@@ -2,6 +2,7 @@ const DB = require('../DinoBase');
 
 function register_endpoints(app) {
   app.post('/tasks', create_task);
+  app.get('/tasks', get_available_tasks);
   app.delete('/tasks/:task_id', delete_task);
 }
 
@@ -57,9 +58,15 @@ function create_task(req, res) {
 
       // Writes in the DB
       if (valid) {
-        new_task.id = data.tasks_next_id++;
-        id = new_task.id;
-        data.tasks[new_task.id] = new_task;
+        if(data.tasks) {
+          new_task.id = data.tasks_next_id++;
+          id = new_task.id;
+          data.tasks[new_task.id] = new_task;
+        } else {
+          data['tasks'] = {};
+          data.tasks[0] = new_task;
+          data.tasks_next_id = 1;
+        }
       }
     });
   }
@@ -100,4 +107,21 @@ function delete_task(req, res) {
   res.send('');
 }
 
-module.exports = {register_endpoints, create_task, delete_task};
+function get_available_tasks(req, res) {
+  let result = [];
+  let user = parseInt(req.get('user'));
+  if(user != NaN) {
+    DB.read_data((data) => {
+      if (data.taks) 
+        Object.keys(data.task).forEach(function(k) {
+          console.log(k);
+          if(k.creator == user) result.push(k);
+        });
+    });
+    res.status(200).send(result);
+  } else {
+    res.start(400).send();
+  }
+}
+
+module.exports = {register_endpoints, create_task, delete_task, get_available_tasks};
