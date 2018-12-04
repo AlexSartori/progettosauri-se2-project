@@ -10,7 +10,6 @@ beforeAll(() => {
     clean_db();
 });
 
-
 test("Create valid Task Group", () => {
     clean_db();
 
@@ -52,6 +51,38 @@ test("Create invalid Task Group", () => {
         headers: { 'Content-Type': 'application/json' }
     }).then(res => {
         expect(res.status).toEqual(400);
+        return res.text();
+    });
+});
+
+test("Get specfic existing Task Group", () => {
+    clean_db();
+
+    test_tg = {
+        id: 0,
+        name: "TG #1",
+        tasks: [1, 2, 3, 4]
+    };
+
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({ task_groups: { 0: test_tg } }));
+
+    expect.assertions(2);
+    return fetch(BASE_URL + "task_groups/0")
+    .then(res => {
+        expect(res.status).toEqual(200);
+        return res.text();
+    }).then(res => {
+        expect(JSON.parse(res)).toEqual(test_tg);
+    });
+});
+
+test("Get specfic non-existing Task Group", () => {
+    clean_db();
+
+    expect.assertions(1);
+    return fetch(BASE_URL + "task_groups/12345")
+    .then(res => {
+        expect(res.status).toEqual(404);
         return res.text();
     });
 });
