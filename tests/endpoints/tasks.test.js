@@ -254,3 +254,36 @@ test('Fail delete task user no permission', () => {
     expect(res.status).toEqual(403);
   });
 });
+
+//test get details
+test('Successful get details of a task', () => {
+  expect.assertions(2);
+  new_task = {
+    'text': 'Question1',
+    'answers': []
+  };
+  return fetch(BASE_URL, {
+    method: 'POST',
+    body: JSON.stringify(new_task),
+    headers: {
+      'Content-Type': 'application/json',
+      'user': 0
+    }
+  })
+  .then(res => res.text()).then(res => {;
+    let id = res;
+    return fetch(BASE_URL + '/' + id, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'user': 0
+      }
+    }).then(res => {
+      expect(res.status).toEqual(200);
+      return res.json();
+    })
+    .then(res => {
+      expect(res['text']).toEqual('Question1');
+    });
+  });
+});
