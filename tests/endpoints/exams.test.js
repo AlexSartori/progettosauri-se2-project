@@ -291,6 +291,234 @@ test("Delete non-existing Exam", () => {
     });
 });
 
+test("Get exam's tasks and start the exam", () => {
+  let db = {
+      exams: {
+          "0": {
+              id: 0,
+              name: 'Exam #1',
+              taskGroup: 121,
+              mode: 'crowd sourcing',
+              class: 18,
+              TA: [12],
+              deadline: '2222-01-15 23:59',
+              duration: 120,
+              start: '2018-01-15 00:00'
+          }
+      },
+      classes: {
+        18: {
+          id: 18,
+          users: [1, 2],
+          name: 'Class #19',
+          creator: 0
+        }
+      },
+      users: {
+        0: {},
+        1: {},
+        2: {},
+        12: {}
+      },
+      enrolls: {
+        '0,1': {
+          tasks: [1, 2, 3]
+        }
+      },
+      tasks: {
+        1: {
+          id: 1,
+          text: 'Task #1',
+          creator: 0
+        },
+        2: {
+          id: 2,
+          text: 'Task #2',
+          creator: 0
+        },
+        3: {
+          id: 3,
+          text: 'Taks #3',
+          creator: 0,
+          answers: [
+            {
+              id: 1,
+              text: 'True',
+              correct: false
+            },
+            {
+              id: 2,
+              text: 'False',
+              correct: true
+            }
+          ]
+        },
+        4: {
+          id: 4,
+          text: 'Task #4',
+          creator: 0
+        }
+      }
+  };
+
+  fs.writeFileSync(DB.DB_PATH, JSON.stringify(db));
+
+  let expected_response = [
+    {
+      id: 1,
+      text: 'Task #1'
+    },
+    {
+      id: 2,
+      text: 'Task #2'
+    },
+    {
+      id: 3,
+      text: 'Taks #3',
+      answers: [
+        {
+          id: 1,
+          text: 'True'
+        },
+        {
+          id: 2,
+          text: 'False'
+        }
+      ]
+    }
+  ];
+
+  expect.assertions(3);
+  return fetch(BASE_URL + 'exams/0/tasks', {
+    method: 'GET',
+    headers: {
+      'user': 1
+    }
+  })
+  .then(res => {
+    expect(res.status).toEqual(200);
+    return res.text();
+  })
+  .then(body => {
+    expect(JSON.parse(body)).toEqual(expected_response);
+    DB.read_data(data => {
+      let registered_time = new Date(data.enrolls['0,1'].starting_date);
+      let diff = (new Date()) - registered_time;
+      let accetable = diff < 1000;  // Less then 1 second
+      expect(accetable).toBe(true);
+    });
+  });
+});
+
+test("Get tasks of non-existing exam", () => {
+  clean_db();
+
+  expect.assertions(1);
+  return fetch(BASE_URL + 'exams/0/tasks', {
+    method: 'GET',
+    headers: {
+      'user': 1
+    }
+  })
+  .then(res => {
+    expect(res.status).toEqual(404);
+  });
+});
+
+test("Get exam's tasks invalid request", () => {
+  clean_db();
+
+  expect.assertions(1);
+  return fetch(BASE_URL + 'exams/0/tasks', {
+    method: 'GET'
+  })
+  .then(res => {
+    expect(res.status).toEqual(400);
+  });
+});
+
+test("Get exam's tasks unauthorized", () => {
+  let db = {
+      exams: {
+          "0": {
+              id: 0,
+              name: 'Exam #1',
+              taskGroup: 121,
+              mode: 'crowd sourcing',
+              class: 18,
+              TA: [12],
+              deadline: '2222-01-15 23:59',
+              duration: 120,
+              start: '2018-01-15 00:00'
+          }
+      },
+      classes: {
+        18: {
+          id: 18,
+          users: [1, 2],
+          name: 'Class #19',
+          creator: 0
+        }
+      }
+  };
+
+  fs.writeFileSync(DB.DB_PATH, JSON.stringify(db));
+
+  expect.assertions(1);
+  return fetch(BASE_URL + 'exams/0/tasks', {
+    method: 'GET',
+    headers: {
+      'user': 5
+    }
+  })
+  .then(res => {
+    expect(res.status).toEqual(403);
+  });
+});
+
+test("Get tasks of not started exam", () => {
+  let current_date = new Date();
+  let tomorrow = new Date();
+  tomorrow.setDate(current_date.getDate() + 1);
+  tomorrow = tomorrow.toString();
+  let db = {
+      exams: {
+          "0": {
+              id: 0,
+              name: 'Exam #1',
+              taskGroup: 121,
+              mode: 'crowd sourcing',
+              class: 18,
+              TA: [12],
+              deadline: '2222-01-15 23:59',
+              duration: 120,
+              start: tomorrow
+          }
+      },
+      classes: {
+        18: {
+          id: 18,
+          users: [1, 2],
+          name: 'Class #19',
+          creator: 0
+        }
+      }
+  };
+
+  fs.writeFileSync(DB.DB_PATH, JSON.stringify(db));
+
+  expect.assertions(1);
+  return fetch(BASE_URL + 'exams/0/tasks', {
+    method: 'GET',
+    headers: {
+      'user': 1
+    }
+  })
+  .then(res => {
+    expect(res.status).toEqual(403);
+  });
+});
+
 afterAll(() => {
     clean_db();
     server.close();
