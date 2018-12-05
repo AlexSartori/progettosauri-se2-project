@@ -5,6 +5,7 @@ function register_endpoints(app) {
     app.post('/exams', create_exam);
     app.delete('/exams/:exam_id', delete_exam);
     app.put('/exams/:exam_id', edit_exam);
+    app.get('/exams/:exam_id/tasks', start_exam);
 }
 
 function get_exam(req, res) {
@@ -94,6 +95,74 @@ function edit_exam(req, res) {
             }
         });
     }
+}
+
+function start_exam(req, res) {
+  let current_date = new Date();
+  let user_id = req.get('user') || '';
+  let exam_id = parseInt(req.params.exam_id);
+  let status = 200;
+  let response = '';
+
+  if (user_id != '')
+    DB.edit_data(data => {
+      if (data.exams == undefined || data.exams[exam_id] == undefined)
+        status = 404;  // Exam not found
+      else {
+        let exam = data.exams[exam_id];
+        let class_id = exam.class;
+        let cls = data.classes[class_id];
+
+        // Check if user is in the class
+        user_id = parseInt(user_id);
+        if (!cls.users.includes(user_id))
+          status = 403; // Permission denied, the exam is not assigned to the user
+        else {
+          let starting_date = new Date(exam.start);
+
+          // Check if the exam is started
+          if (current_date - starting_date < 0)
+            status = 403; // Permission denied, the exam is not started yet
+          else {
+            let enroll_id = `${exam_id},${user_id}`;
+            let enroll = data.enrolls[enroll_id];
+
+            // Set the starting date if neccessary
+            if (enroll.starting_date == undefined)
+              enroll.starting_date = current_date.toString();
+
+            // Create the response
+            response = []
+            enroll.tasks.forEach(task_id => {
+              let task = data.tasks[task_id];
+              let obj = {
+                id: task.id,
+                text: task.text
+              };
+
+              // Add the answers if needed
+              if (task.answers != undefined) {
+                obj.answers = []
+                task.answers.forEach(answer => {
+                  let custom_answer = {
+                    id: answer.id,
+                    text: answer.text
+                  };
+                  obj.answers.push(custom_answer);
+                });
+              }
+
+              response.push(obj);
+            });
+            status = 200;
+          }
+        }
+      }
+    });
+  else
+    status = 400; // Bad Request, user id not in the header
+
+  res.status(status).send(response);
 }
 
 module.exports = { register_endpoints };
