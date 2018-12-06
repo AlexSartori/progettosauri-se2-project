@@ -1,11 +1,11 @@
 const DB = require('../DinoBase');
 
-function register_endpoints(app) {
-  app.post('/classes', create_class);
-  app.get('/classes', get_classes);
-  app.delete('/classes/:class_id', delete_class);
-  app.get('/classes/:class_id', get_info_class);
-  app.put('/classes/:class_id', modify_class);
+function register_endpoints(app, base_path) {
+  app.post(base_path + '/classes', create_class);
+  app.get(base_path + '/classes', get_classes);
+  app.delete(base_path + '/classes/:class_id', delete_class);
+  app.get(base_path + '/classes/:class_id', get_info_class);
+  app.put(base_path + '/classes/:class_id', modify_class);
 }
 
 function create_class(req, res) {

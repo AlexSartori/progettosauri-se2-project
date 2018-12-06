@@ -1,11 +1,11 @@
 const DB = require('../DinoBase');
 
-function register_endpoints(app) {
-    app.get('/task_groups', get_all_tgs);
-    app.get('/task_groups/:tg_id', get_tg);
-    app.post('/task_groups', create_tg);
-    app.put('/task_groups/:tg_id', edit_tg);
-    app.delete('/task_groups/:tg_id', delete_tg);
+function register_endpoints(app, base_path) {
+    app.get(base_path + '/task_groups', get_all_tgs);
+    app.get(base_path + '/task_groups/:tg_id', get_tg);
+    app.post(base_path + '/task_groups', create_tg);
+    app.put(base_path + '/task_groups/:tg_id', edit_tg);
+    app.delete(base_path + '/task_groups/:tg_id', delete_tg);
 }
 
 function get_all_tgs(req, res) {

@@ -4,7 +4,7 @@ const fs = require('fs');
 const clean_db = require('../test_utils').clean_db;
 const server = require('../../index').server;
 const PORT = require('../../index').PORT;
-const BASE_URL = `http://localhost:${PORT}/`;
+const BASE_URL = `http://localhost:${PORT}/api/v1/`;
 
 beforeAll(() => {
     clean_db();
@@ -208,7 +208,7 @@ test("Modify non-existing Task Group", () => {
         name: "TG #1",
         tasks: [1, 2, 3, 4]
     };
-    
+
     expect.assertions(1);
     return fetch(BASE_URL + "task_groups/12345", {
         method: 'put',

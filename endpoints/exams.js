@@ -1,11 +1,11 @@
 const DB = require('../DinoBase');
 
-function register_endpoints(app) {
-    app.get('/exams/:exam_id', get_exam);
-    app.post('/exams', create_exam);
-    app.delete('/exams/:exam_id', delete_exam);
-    app.put('/exams/:exam_id', edit_exam);
-    app.get('/exams/:exam_id/tasks', start_exam);
+function register_endpoints(app, base_path) {
+    app.get(base_path + '/exams/:exam_id', get_exam);
+    app.post(base_path + '/exams', create_exam);
+    app.delete(base_path + '/exams/:exam_id', delete_exam);
+    app.put(base_path + '/exams/:exam_id', edit_exam);
+    app.get(base_path + '/exams/:exam_id/tasks', start_exam);
 }
 
 function get_exam(req, res) {

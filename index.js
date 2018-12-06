@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 // Call register_endpoints for each file
 fs.readdirSync(endpoints_dir).forEach((file) => {
   let register = require(`./${endpoints_dir}/${file}`).register_endpoints;
-  register(app);
+  register(app, "/api/v1");
 });
 
 server = app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));

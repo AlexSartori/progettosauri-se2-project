@@ -7,7 +7,7 @@ const fs = require('fs');
 const app = require('../../index').app;
 const server = require('../../index').server;
 const PORT = require('../../index').PORT;
-const BASE_URL = `http://localhost:${PORT}/classes`;
+const BASE_URL = `http://localhost:${PORT}/api/v1/classes`;
 
 beforeAll(() => {
   fs.writeFileSync(DB.DB_PATH, JSON.stringify({

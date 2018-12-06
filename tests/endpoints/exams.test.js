@@ -5,7 +5,7 @@ const DB = require('../../DinoBase');
 const clean_db = require('../test_utils').clean_db;
 const server = require('../../index').server;
 const PORT = process.env.PORT || require('../../index').PORT;
-const BASE_URL = `http://localhost:${PORT}/`;
+const BASE_URL = `http://localhost:${PORT}/api/v1/`;
 
 
 beforeAll(() => {

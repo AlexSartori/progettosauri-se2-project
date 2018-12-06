@@ -1,11 +1,11 @@
 const DB = require('../DinoBase');
 
-function register_endpoints(app) {
-  app.post('/tasks', create_task);
-  app.get('/tasks', get_available_tasks);
-  app.delete('/tasks/:task_id', delete_task);
-  app.get('/tasks/:task_id', get_task);
-  app.put('/tasks/:task_id', modify_task);
+function register_endpoints(app, base_path) {
+  app.post(base_path + '/tasks', create_task);
+  app.get(base_path + '/tasks', get_available_tasks);
+  app.delete(base_path + '/tasks/:task_id', delete_task);
+  app.get(base_path + '/tasks/:task_id', get_task);
+  app.put(base_path + '/tasks/:task_id', modify_task);
 }
 
 function create_task(req, res) {
@@ -221,5 +221,5 @@ function modify_task(req, res) {
     res.status(400).send();
 }
 
-module.exports = {register_endpoints, create_task, delete_task, 
+module.exports = {register_endpoints, create_task, delete_task,
   get_available_tasks, get_task, modify_task};

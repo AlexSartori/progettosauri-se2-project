@@ -1,10 +1,10 @@
 const DB = require('../DinoBase');
 
-function register_endpoints(app) {
-    app.post('/users', create_user);
-    app.get('/users/:user_id', get_user_details);
-    app.delete('/users/:user_id', delete_user);
-    app.put('/users/:user_id',edit_user_details);
+function register_endpoints(app, base_path) {
+    app.post(base_path + '/users', create_user);
+    app.get(base_path + '/users/:user_id', get_user_details);
+    app.delete(base_path + '/users/:user_id', delete_user);
+    app.put(base_path + '/users/:user_id',edit_user_details);
 }
 
 // Check path validity
