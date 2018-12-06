@@ -1109,7 +1109,7 @@ definitions:
       id:
         type: integer
         description: "Identifier of the user"
-      email:
+      mail:
         type: string
         description: "Email of the user"
       password:
@@ -1122,7 +1122,7 @@ definitions:
   UserPost:
     type: object
     properties:
-      email:
+      mail:
         type: string
         description: "Email of the user"
       password:
@@ -1132,14 +1132,14 @@ definitions:
         type: string
         description: "Name of the user"
     required:
-      - email
+      - mail
       - password
       - name
 
   UserPut:
     type: object
     properties:
-      email:
+      mail:
         type: string
         description: "Email of the user"
       password:
