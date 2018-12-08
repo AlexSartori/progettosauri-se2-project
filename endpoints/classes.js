@@ -40,6 +40,10 @@ function create_class(req, res) {
 
       // Writes in the DB
       if (valid) {
+        if(!data.classes) {
+          data.classes = {}
+          data.classes.classes_next_id = 0;
+        }
         new_class.id = data.classes_next_id++;
         data.classes[new_class.id] = new_class;
       }

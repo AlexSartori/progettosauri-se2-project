@@ -1,1 +1,1 @@
-{}
+{"users":{"0":{"id":0,"name":"dinoname","mail":"prova@dinomail.com","password":"dinopwd"},"1":{"id":1,"name":"dinoname","mail":"prova@dinomail.com","password":"dinopwd"}},"users_next_id":2,"classes":{"0":{"name":"prova","creator":0,"users":[1],"id":0},"1":{"name":"prova","creator":0,"users":[1],"id":1},"2":{"name":"prova_class","creator":0,"users":[1],"id":2},"classes_next_id":0,"NaN":{"name":"prova","creator":0,"users":[1],"id":null}},"classes_next_id":3}
