@@ -83,7 +83,10 @@ function delete_user(req, res){
             DB.edit_data((data) => {
                 //Check: if the user exists delete it else send error
                 if (data.users && typeof(data.users[req.params.user_id])!=undefined){
-                  delete data.users[req.params.user_id]
+                  data.users = data.users.filter(function(item) {
+                    return item !== data.users[req.params.user_id];
+                  });
+                  //delete data.users[req.params.user_id]
                   res.status(200).send("Success, account has been deleted")
                 } else {
                   res.status(404).send("User does not exist")
