@@ -60,7 +60,7 @@ function get_user_details(req, res){
     } else {
         DB.edit_data((data) => {
         //check if the user exists else sende error
-            if (data.users && typeof(data.users[req.params.user_id])!=undefined){
+            if (data.users && req.params.user_id in data.users){
                 res.status(200).send(data.users[req.params.user_id])
             } else {
                res.status(404).send("User does not exist")
