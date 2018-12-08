@@ -180,7 +180,7 @@ function get_myexams(req, res) {
             });
             res.status(200).send(JSON.stringify(result));
         } else {
-            res.status(400).send();
+            res.status(400).send("No user");
         }
     });
 }
