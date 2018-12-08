@@ -55,10 +55,7 @@ function create_exam(req, res) {
         res.status(400).send();
     } else {
         DB.edit_data((data) => {
-            if (!data.exams) {
-                data.exams = {};
-                data.exams_next_id = 0;
-            }
+            if (!data.exams) data.exams = { exams_next_id: 0 };
             next_id = data.exams.exams_next_id++;
             new_exam = param;
             new_exam.id = next_id;
@@ -176,7 +173,6 @@ function get_myexams(req, res) {
         if(data.exams != undefined && user_id != '') {
             Object.keys(data.exams).forEach(e_key => {
                 let class_id = data.exams[e_key].class;
-                console.log(class_id);
                 let cls = data.classes[class_id];
                 user_id = parseInt(user_id);
                 if (cls != undefined && cls.users.includes(user_id)) {
