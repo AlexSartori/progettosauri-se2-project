@@ -170,7 +170,7 @@ function get_myexams(req, res) {
     let user_id = req.get('user') || '';
     let result = [];
     DB.read_data((data) => {
-        if(data.exams != undefined && req.id) {
+        if(data.exams != undefined && user_id != '') {
             data.exams.forEach(exam => {
                 let class_id = exam.class;
                 let cls = data.classes[class_id];
@@ -180,7 +180,8 @@ function get_myexams(req, res) {
             });
             res.status(200).send(JSON.stringify(result));
         } else {
-            res.status(400).send("No user");
+            if(user_id == '') res.status(400).send("No user");
+            else res.status(404).send("No exams found")
         }
     });
 }
