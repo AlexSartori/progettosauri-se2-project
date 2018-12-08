@@ -174,6 +174,7 @@ function get_myexams(req, res) {
             data.exams.forEach(exam => {
                 let class_id = exam.class;
                 let cls = data.classes[class_id];
+                user_id = parseInt(user_id);
                 if (cls.users.includes(user_id)) {
                     result.push(exam.id);
                 }
