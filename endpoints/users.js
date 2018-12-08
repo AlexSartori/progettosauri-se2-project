@@ -55,19 +55,18 @@ function create_user(req, res) {
 // GET /users/:user_id
 function get_user_details(req, res){
   //Check required parameters
-    if (!check_path(req.params.user_id)){
-        res.status(400).send("Bad parameter, user_id should be a positive integer")
-    } else {
-        DB.edit_data((data) => {
-        //check if the user exists else sende error
-            if (data.users && req.params.user_id in data.users){
-                res.status(200).send(data.users[req.params.user_id])
-            } else {
-               res.status(404).send("User does not exist")
-            }
-          });
-
-    }
+  if (!check_path(req.params.user_id)){
+    res.status(400).send("Bad parameter, user_id should be a positive integer")
+  } else {
+    DB.read_data((data) => {
+    //check if the user exists else sende error
+      if (data.users && req.params.user_id in data.users){
+        res.status(200).send(data.users[req.params.user_id])
+      } else {
+        res.status(404).send("User does not exist")
+      }
+    });
+  }
 }
 
 // DELETE /users/:user_id
@@ -83,6 +82,7 @@ function delete_user(req, res){
             DB.edit_data((data) => {
                 //Check: if the user exists delete it else send error
                 if (data.users && (typeof(data.users[req.params.user_id])!=undefined)){
+                  res.send(req.param.user_id.toString())
                   delete data.users[req.params.user_id]
                   res.status(200).send("Success, account has been deleted")
                 } else {
