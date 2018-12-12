@@ -6,11 +6,11 @@ function register_endpoints(app, base_path) {
     app.delete(base_path + '/exams/:exam_id', delete_exam);
     app.put(base_path + '/exams/:exam_id', edit_exam);
     app.get(base_path + '/exams/:exam_id/tasks', start_exam);
-    app.get(base_path + '/exams', get_myexams);
+    app.get(base_path + '/exams', get_all_exams);
 }
 
 function get_exam(req, res) {
-    if (!req.params.exam_id || isNaN(parseInt(req.params.exam_id)))
+    if (isNaN(parseInt(req.params.exam_id)))
         res.status(400).send("Invalid ID");
     else {
         DB.edit_data((data) => {
@@ -68,6 +68,7 @@ function create_exam(req, res) {
 
 function edit_exam(req, res) {
     // Check validity
+    let id = parseInt(req.params.exam_id);
     let param = req.body, valid = true;
     valid &= param.name != undefined && typeof(param.name) == 'string';
     valid &= param.taskGroup != undefined && typeof(param.taskGroup) == 'number';
@@ -79,14 +80,13 @@ function edit_exam(req, res) {
     valid &= param.duration != undefined && typeof(param.duration) == 'number';
     valid &= new Date(param.start).toString() !== "Invalid Date";
 
-    let id = parseInt(req.params.exam_id);
-    if (!valid) {
+    if (!valid || isNaN(id)) {
         res.status(400).send();
     } else if (!data.exams || !data.exams[id]) {
         res.status(404).send("No such exam");
     } else {
         DB.edit_data((data) => {
-            if (data.exams[id].TA.some((ta) => ta == parseInt(req.get('user')))) {
+            if (data.exams[id].TA.includes(parseInt(req.get('user')))) {
                 new_exam = param;
                 new_exam.id = parseInt(id);
                 data.exams[id] = new_exam;
@@ -107,7 +107,7 @@ function start_exam(req, res) {
 
   if (user_id != '')
     DB.edit_data(data => {
-      if (data.exams == undefined || data.exams[exam_id] == undefined)
+      if (!data.exams || !data.exams[exam_id])
         status = 404;  // Exam not found
       else {
         let exam = data.exams[exam_id];
@@ -166,25 +166,24 @@ function start_exam(req, res) {
   res.status(status).send(response);
 }
 
-function get_myexams(req, res) {
-    let user_id = req.get('user') || '';
+function get_all_exams(req, res) {
+    let logged_user = parseInt(req.get('user'));
     let result = [];
+
+    if (!logged_user)
+        res.status(403).send("Permission denied");
+
     DB.read_data((data) => {
-        if(data.exams != undefined && user_id != '') {
-            Object.keys(data.exams).forEach(e_key => {
-                let class_id = data.exams[e_key].class;
-                let cls = data.classes[class_id];
-                user_id = parseInt(user_id);
-                if (cls != undefined && cls.users.includes(user_id)) {
-                    result.push(data.exams[e_key].id);
-                }
+        if (data.exams)
+            Object.keys(data.exams).forEach((k) => {
+                let ex = data.exams[k];
+                let in_ta = ex.TA.includes(logged_user);
+                if (in_ta || (data.classes && data.classes[ex.class].includes(logged_user)))
+                    result.push(data.exams[k])
             });
-            res.status(200).send(JSON.stringify(result));
-        } else {
-            if(user_id == '') res.status(400).send("No user");
-            else res.status(404).send("No exams found")
-        }
     });
+
+    res.status(200).send(result);
 }
 
 module.exports = { register_endpoints };

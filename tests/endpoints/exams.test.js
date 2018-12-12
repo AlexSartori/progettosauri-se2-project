@@ -33,7 +33,6 @@ test("Create valid Exam", () => {
         headers: { 'Content-Type': 'application/json' }
     }).then(res => {
         expect(res.status).toEqual(201);
-        return res.text();
     }).then(() => {
         DB.edit_data((data) => {
             test_exam.id = 0;
@@ -44,6 +43,7 @@ test("Create valid Exam", () => {
 
 test("Create invalid exam", () => {
     test_exam = {
+        mode: 'crowd sourcing',
         wrong: 'parameter'
     };
 
@@ -54,7 +54,6 @@ test("Create invalid exam", () => {
         headers: { 'Content-Type': 'application/json' }
     }).then(res => {
         expect(res.status).toEqual(400);
-        return res.text();
     });
 });
 
@@ -62,7 +61,7 @@ test("Modify valid Exam", () => {
     let test_exam = {
         name: 'Test Exam',
         taskGroup: 0,
-        mode: 'exam',
+        mode: 'crowd sourcing',
         class: 5,
         TA: [2, 12, 6],
         deadline: '2018-12-21 20:00',
@@ -89,7 +88,6 @@ test("Modify valid Exam", () => {
         headers: { 'Content-Type': 'application/json', 'user': 12 }
     }).then(res => {
         expect(res.status).toEqual(200);
-        return res.text();
     }).then(() => {
         DB.edit_data((data) => {
             expect(data.exams[0]).toEqual(test_exam);
@@ -128,7 +126,6 @@ test("Modify invalid Exam", () => {
         headers: { 'Content-Type': 'application/json', 'user': 2}
     }).then(res => {
         expect(res.status).toEqual(400);
-        return res.text();
     });
 });
 
@@ -146,13 +143,35 @@ test("Modify non-existing Exam", () => {
     };
 
     expect.assertions(1);
-    return fetch(BASE_URL + "exams", {
+    return fetch(BASE_URL + "exams/12345", {
         method: 'put',
         body: JSON.stringify(test_exam),
         headers: { 'Content-Type': 'application/json', 'user': 6 }
     }).then(res => {
         expect(res.status).toEqual(404);
-        return res.text();
+    });
+});
+
+test("Modify Exam with invalid ID", () => {
+    let test_exam = {
+        id: 12345,
+        name: 'Non-Existing Exam',
+        taskGroup: 0,
+        mode: 'exam',
+        class: 5,
+        TA: [2, 12, 6],
+        deadline: '2018-12-21 20:00',
+        duration: 120,
+        start: '2018-12-15 08:00'
+    };
+
+    expect.assertions(1);
+    return fetch(BASE_URL + "exams/should_be_int", {
+        method: 'put',
+        body: JSON.stringify(test_exam),
+        headers: { 'Content-Type': 'application/json', 'user': 6 }
+    }).then(res => {
+        expect(res.status).toEqual(400);
     });
 });
 
@@ -182,7 +201,58 @@ test("Modify unauthorized Exam", () => {
         headers: { 'Content-Type': 'application/json', 'user': 12345 }
     }).then(res => {
         expect(res.status).toEqual(403);
-        return res.text();
+    });
+});
+
+test("Get all Exams but unauthenticated", () => {
+    expect.assertions(1);
+    return fetch(BASE_URL + "exams/")
+    .then(res => {
+        expect(res.status).toEqual(403);
+    });
+});
+
+test("Get all Exams", () => {
+    let test_exam_1 = {
+        id: 0,
+        name: 'Exam #1',
+        taskGroup: 121,
+        mode: 'crowd sourcing',
+        class: 18,
+        TA: [12, 23],
+        deadline: '2019-01-15 23:59',
+        duration: 120,
+        start: '2019-01-15 00:00'
+    };
+
+    let test_exam_2 = {
+        id: 1,
+        name: 'Exam #2',
+        taskGroup: 30,
+        mode: 'crowd sourcing',
+        class: 2,
+        TA: [23, 45],
+        deadline: '2019-01-15 23:59',
+        duration: 120,
+        start: '2019-01-15 00:00'
+    };
+
+    fs.writeFileSync(DB.DB_PATH, JSON.stringify({
+        exams: {
+            0: test_exam_1,
+            1: test_exam_2
+        }
+    }));
+
+    expect.assertions(2);
+    return fetch(BASE_URL + "exams/", { headers: { 'user': 23 } })
+    .then(res => {
+        expect(res.status).toEqual(200);
+        return res.json();
+    }).then(res => {
+        expect(res).toEqual([test_exam_1, test_exam_2]);
+    }).then(() => {
+        clean_db();
     });
 });
 
@@ -205,11 +275,19 @@ test("Get existing Exam", () => {
     return fetch(BASE_URL + "exams/0")
     .then(res => {
         expect(res.status).toEqual(200);
-        return res.text();
+        return res.json();
     }).then(res => {
-        expect(JSON.parse(res)).toEqual(test_exam);
+        expect(res).toEqual(test_exam);
     }).then(() => {
         clean_db();
+    });
+});
+
+test("Get Exam with invalid ID", () => {
+    expect.assertions(1);
+    return fetch(BASE_URL + "exams/should_be_int")
+    .then(res => {
+        expect(res.status).toEqual(400);
     });
 });
 
@@ -219,7 +297,6 @@ test("Get non-existing Exam", () => {
     return fetch(BASE_URL + "exams/12345")
     .then(res => {
         expect(res.status).toEqual(404);
-        return res.text();
     });
 });
 
@@ -246,7 +323,6 @@ test("Delete existing Exam", () => {
         headers: { 'user': 12 }
     }).then(res => {
         expect(res.status).toEqual(200);
-        return res.text();
     }).then(() =>
         clean_db()
     );
@@ -275,7 +351,6 @@ test("Delete unauthorized Exam", () => {
         headers: { user: 12345 }
     }).then(res => {
         expect(res.status).toEqual(403);
-        return res.text();
     }).then(() =>
         clean_db()
     );
@@ -287,7 +362,6 @@ test("Delete non-existing Exam", () => {
     return fetch(BASE_URL + "exams/12345", {method: 'delete'})
     .then(res => {
         expect(res.status).toEqual(404);
-        return res.text();
     });
 });
 
@@ -397,10 +471,10 @@ test("Get exam's tasks and start the exam", () => {
   })
   .then(res => {
     expect(res.status).toEqual(200);
-    return res.text();
+    return res.json();
   })
   .then(body => {
-    expect(JSON.parse(body)).toEqual(expected_response);
+    expect(body).toEqual(expected_response);
     DB.read_data(data => {
       let registered_time = new Date(data.enrolls['0,1'].starting_date);
       let diff = (new Date()) - registered_time;
