@@ -6,6 +6,7 @@ const USER_URL = 'users/'
 const create_users = require('../test_utils').create_users
 const clean_db = require('../test_utils').clean_db
 const DB = require('../../DinoBase');
+const check_path = require('../../endpoints/users').check_path;
 
 beforeAll(() => {
   clean_db()
@@ -187,8 +188,9 @@ test('Get user test, invalid ID, negative integer ', () => {
 
 // - user_id is not in db
 test('Get user test, invalid ID, not found', () => {
-    clean_db()
-    ID = 1
+    clean_db();
+    create_users();
+    ID = 100;
     expect.assertions(2);
     return fetch(BASE_URL + USER_URL+ ID
     ).then(res => {
@@ -270,8 +272,9 @@ test('Delete user test, invalid user_id, negative integer ', () => {
 // - user_id is not in db (user_id should be equal to user in headers)
 test('Delete user test, user_ID not in db', () => {
     clean_db();
+    create_users();
     expect.assertions(2);
-    ID = 0
+    ID = 100;
     return fetch(BASE_URL + USER_URL+ ID,  {
         method: 'DELETE',
         headers: {'Content-Type': 'application/json',
@@ -374,17 +377,19 @@ test("Edit user details, invalid test, user_id is not a number", () => {
 })
 // - user not found
 test('Edit user test, user_ID not in db', () => {
-  ID0 = 0
-  var user = create_users()
-  user.users[ID0].name = 'newname'
-  user.users[ID0].password='newpass'
-  clean_db();
+  create_users();
+  mods = {
+    "name": "newname",
+    "password": "newpass",
+    "mail": "newmail"
+  }
+  ID0 = 100;
   expect.assertions(2);
   return fetch(BASE_URL + USER_URL+ ID0,  {
       method: 'PUT',
       headers: {'Content-Type':'application/json',
                 'user' : ID0 },
-      body: JSON.stringify(user.users[ID0])
+      body: JSON.stringify(mods)
     }).then(res => {
         expect(res.status).toEqual(404);
         return res.text();
@@ -432,4 +437,24 @@ test('Edit user test, wrong type parameters in body', () => {
     }).then(text =>
         expect(text).toEqual('Bad parameter'));
         clean_db()
+});
+
+test('check_path id < 0', () => {
+  expect(check_path(-1)).toBe(false);
+});
+
+test('check_path id is NaN', () => {
+  expect(check_path('test')).toBe(false);
+});
+
+test('check_path id not passed', () => {
+  expect(check_path()).toBe(false);
+});
+
+test('check_path valid id as string', () => {
+  expect(check_path('0')).toBe(true);
+});
+
+test('check_path not valid id as string', () => {
+  expect(check_path('-5')).toBe(false);
 });

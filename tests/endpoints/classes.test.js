@@ -11,8 +11,6 @@ const BASE_URL = `http://localhost:${PORT}/api/v1/classes`;
 
 beforeAll(() => {
   fs.writeFileSync(DB.DB_PATH, JSON.stringify({
-    'classes': {},
-    'classes_next_id': 0,
     'users': {
       '0': {
         'id': 0,

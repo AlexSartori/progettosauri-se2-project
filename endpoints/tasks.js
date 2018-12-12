@@ -68,6 +68,7 @@ function create_task(req, res) {
           data['tasks'] = {};
           data.tasks[0] = new_task;
           data.tasks_next_id = 1;
+          id = 0;
         }
       }
     });
@@ -110,9 +111,11 @@ function delete_task(req, res) {
 }
 
 function get_available_tasks(req, res) {
-  let result = [];
+  let result = {
+    created: [],
+    shared: []  // TODO: shareble tasks
+  };
   let user = parseInt(req.get('user'));
-  console.log(user);
   if(user==NaN) {
     res.status(400).send("Bad parameters");
   } else {
@@ -120,7 +123,7 @@ function get_available_tasks(req, res) {
       if (data.tasks) {
         Object.keys(data.tasks).forEach(function(k) {
           let task = data.tasks[k.toString()];
-          if(task.creator == user) result.push(k);
+          if(task.creator == user) result.created.push(k);
         });
       }
     });
@@ -143,7 +146,16 @@ function get_task(req, res) {
         if (data.tasks[task_id] != undefined) {
           if(data.tasks[task_id].creator == user){
             status = 200;
-            content = data.tasks[task_id];
+
+            // Copy the object to send
+            content = {};
+            content.id = data.tasks[task_id].id;
+            content.text = data.tasks[task_id].text;
+            content.answers = [];
+
+            for (var answer_id in data.tasks[task_id].answers)
+              if (data.tasks[task_id].answers.hasOwnProperty(answer_id))
+                content.answers.push(data.tasks[task_id].answers[answer_id]);
           } else
           status = 403;
         } else
