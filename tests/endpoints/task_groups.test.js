@@ -70,20 +70,25 @@ test("Get specfic existing Task Group", () => {
     return fetch(BASE_URL + "task_groups/0")
     .then(res => {
         expect(res.status).toEqual(200);
-        return res.text();
+        return res.json();
     }).then(res => {
-        expect(JSON.parse(res)).toEqual(test_tg);
+        expect(res).toEqual(test_tg);
     });
 });
 
 test("Get specfic non-existing Task Group", () => {
-    clean_db();
-
     expect.assertions(1);
     return fetch(BASE_URL + "task_groups/12345")
     .then(res => {
         expect(res.status).toEqual(404);
-        return res.text();
+    });
+});
+
+test("Get Task Group with invalid ID", () => {
+    expect.assertions(1);
+    return fetch(BASE_URL + "task_groups/should_be_int")
+    .then(res => {
+        expect(res.status).toEqual(400);
     });
 });
 
@@ -112,9 +117,9 @@ test("Get all Task Groups", () => {
     return fetch(BASE_URL + "task_groups")
     .then(res => {
         expect(res.status).toEqual(200);
-        return res.text();
+        return res.json();
     }).then(res => {
-        expect(JSON.parse(res)).toEqual([test_tg_1, test_tg_2]);
+        expect(res).toEqual([test_tg_1, test_tg_2]);
     });
 });
 
@@ -133,18 +138,22 @@ test("Delete existing Task Group", () => {
     return fetch(BASE_URL + "task_groups/0", {method: 'delete'})
     .then(res => {
         expect(res.status).toEqual(200);
-        return res.text();
     });
 });
 
 test("Delete non-existing Task Group", () => {
-    clean_db();
-
     expect.assertions(1);
     return fetch(BASE_URL + "task_groups/12345", {method: 'delete'})
     .then(res => {
         expect(res.status).toEqual(404);
-        return res.text();
+    });
+});
+
+test("Delete Task Group with invalid ID", () => {
+    expect.assertions(1);
+    return fetch(BASE_URL + "task_groups/should_be_int", {method: 'delete'})
+    .then(res => {
+        expect(res.status).toEqual(400);
     });
 });
 
@@ -197,13 +206,10 @@ test("Modify invalid Task Group", () => {
         headers: { 'Content-Type': 'application/json' }
     }).then(res => {
         expect(res.status).toEqual(400);
-        return res.text();
     });
 });
 
 test("Modify non-existing Task Group", () => {
-    clean_db();
-
     test_tg = {
         name: "TG #1",
         tasks: [1, 2, 3, 4]
@@ -217,6 +223,22 @@ test("Modify non-existing Task Group", () => {
     }).then(res => {
         expect(res.status).toEqual(404);
         return res.text();
+    });
+});
+
+test("Modify Task Group with invalid ID", () => {
+    test_tg = {
+        name: "TG #1",
+        tasks: [1, 2, 3, 4]
+    };
+
+    expect.assertions(1);
+    return fetch(BASE_URL + "task_groups/should_be_int", {
+        method: 'put',
+        body: JSON.stringify(test_tg),
+        headers: { 'Content-Type': 'application/json' }
+    }).then(res => {
+        expect(res.status).toEqual(400);
     });
 });
 
