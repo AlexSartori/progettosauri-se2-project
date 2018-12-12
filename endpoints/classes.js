@@ -42,7 +42,7 @@ function create_class(req, res) {
       if (valid) {
         if(!data.classes) {
           data.classes = {}
-          data.classes.classes_next_id = 0;
+          data.classes_next_id = 0;
         }
         new_class.id = data.classes_next_id++;
         data.classes[new_class.id] = new_class;
@@ -70,7 +70,6 @@ function get_classes(req, res) {
           if (data.classes.hasOwnProperty(id))
             if (data.classes[id].creator == user)
               response.push(data.classes[id]);
-        response = JSON.stringify(response);
       }
       else {
         status = 400;
