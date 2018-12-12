@@ -103,7 +103,9 @@ function edit_user_details(req, res) {
         DB.edit_data((data) => {
           // Check if user exists else send error
             if(data.users && data.users[req.params.user_id] != undefined) {
-                data.users[req.params.user_id] = req.body;
+                data.users[req.params.user_id].name = req.body.name;
+                data.users[req.params.user_id].mail = req.body.mail;
+                data.users[req.params.user_id].password = req.body.password;
                 res.status(200).send(data.users[req.params.user_id])
             } else {
                 res.status(404).send("User does not exist");
